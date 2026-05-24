@@ -1,48 +1,76 @@
-# Agent: {{nome_amigavel}}
+# 📋 Agent: {{nome_amigavel}}
 
-> Identidade do agent. Define quem ele é, o que faz e o que entrega.
+> **Contrato de identidade** — define quem o agent é, o que faz e o que entrega ao utilizador.
 
-## Identidade
+---
 
-- **Nome técnico:** `{{nome}}`
-- **Nome amigável:** {{nome_amigavel}}
-- **Versão:** {{metadata.versao_blueprint}}
-- **Criado em:** {{metadata.criado_em}}
+## 📋 Identidade
 
-## Descrição
+| Campo | Valor |
+|-------|-------|
+| **Nome técnico** | `{{nome}}` |
+| **Nome amigável** | {{nome_amigavel}} |
+| **Versão** | {{metadata.versao_blueprint}} |
+| **Criado em** | {{metadata.criado_em}} |
+
+---
+
+## 🎯 Descrição
 
 {{descricao}}
 
-## Tipo
+---
+
+## 🏷️ Tipo
 
 **{{tipo}}** — {{tipo_descricao}}
 
-## Objetivo
+> O tipo orienta o comportamento social do agent: se pergunta, se decompõe, ou se executa directo.
+
+---
+
+## 🎯 Objetivo
 
 {{objetivo}}
 
-> O objetivo orienta TODAS as decisões do agent. Sem objetivo claro, não há agent — há apenas automação.
+> O objetivo orienta **TODAS** as decisões do agent. Sem objetivo claro, não há agent — há apenas automação.
 
-## Contrato de Saída
+---
 
-- **Formato:** `{{contrato_saida.formato}}`
-- **Campos obrigatórios:**
+## 📦 Contrato de Saída
+
+| Campo | Valor |
+|-------|-------|
+| **Formato** | `{{contrato_saida.formato}}` |
+
+**Campos obrigatórios:**
+
 {{#each contrato_saida.campos_obrigatorios}}
-  - `{{this}}`
+- `{{this}}`
 {{/each}}
 
-## Modelo
+> O runtime só pode `FINALIZAR` quando todos os campos obrigatórios estiverem preenchidos.
 
-- **Provider:** `{{provider}}`
-- **Modelo:** `{{modelo}}`
+---
 
-## Tags
+## 🤖 Modelo
+
+```yaml
+provider: {{provider}}    # auto = usa o modelo do Cursor
+modelo: {{modelo}}
+```
+
+---
+
+## 🏷️ Tags
 
 {{#each metadata.tags}}
 - `{{this}}`
 {{/each}}
 
-## Metadata
+---
+
+## 📎 Metadata
 
 ```yaml
 criado_por: {{metadata.criado_por}}

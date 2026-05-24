@@ -26,14 +26,23 @@ agent-forge/
 ├── web/                     ← UI Vite → http://localhost:5173
 ├── slides/                  ← apresentação HTML do fluxo
 └── docs/
-    └── RUNTIME-CURSOR.md
+    ├── PEDAGOGIA.md         ← formato rico de respostas (wizard + execução)
+    ├── RUNTIME-CURSOR.md
+    └── SEGURANCA.md
 ```
 
 ## Como usar
 
-### Wizard no Cursor
+### Wizard pedagógico no Cursor
 
-Peça **"criar um agent"** ou **"agent forge"**. A skill `criador-de-agents` gera o blueprint e os contratos.
+Peça **"criar um agent"** ou **"agent forge"**. A skill `criador-de-agents` conduz um fluxo **problema → recomendação com porquê → confirmação → geração**:
+
+1. Descreves o **problema** que queres resolver
+2. O assistente **recomenda** tipo, arquitetura, skills, toolbox, loop e memória — com tabelas comparativas e secção **📚 Porque escolhi isto**
+3. Confirmas ou ajustas
+4. Gera os **9 contratos** com formato escaneável (emojis, tabelas, YAML comentado)
+
+Guia de formato: [docs/PEDAGOGIA.md](docs/PEDAGOGIA.md)
 
 ### Gerar contratos
 

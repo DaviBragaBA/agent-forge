@@ -1,53 +1,63 @@
-# Memory: {{nome_amigavel}}
+# 💾 Memory: {{nome_amigavel}}
 
-> Gestão de memória do agent. Define o que lembrar, por quanto tempo e como recuperar.
+> **Contrato de memória** — o que lembrar, por quanto tempo e como recuperar.
 
-## Tipos de Memória Habilitados
+---
+
+## 📊 Tipos de Memória Habilitados
 
 | Tipo | Habilitado | Propósito |
 |------|------------|-----------|
-| Curta | {{memory.curta}} | Estado da execução atual (vive durante o ciclo) |
-| Longa | {{memory.longa}} | Fatos persistentes sobre o domínio |
-| Episódica | {{memory.episodica}} | Histórico de execuções e lições |
-| Contextual | {{memory.contextual}} | Recuperação por similaridade semântica |
+| **Curta** | {{memory.curta}} | Estado da execução actual |
+| **Longa** | {{memory.longa}} | Factos persistentes do domínio |
+| **Episódica** | {{memory.episodica}} | Histórico de execuções e lições |
+| **Contextual** | {{memory.contextual}} | Recuperação por similaridade semântica |
 
-## Configuração
+---
+
+## ⚙️ Configuração
 
 ```yaml
-limite_registros: {{memory.limite_registros}}
-embedding_model: {{memory.embedding_model}}
+limite_registros: {{memory.limite_registros}}    # teto de entradas
+embedding_model: {{memory.embedding_model}}      # só se contextual = true
 ```
 
-## Políticas de Persistência
+---
 
-### Memória Curta
-- Vive APENAS durante a execução atual
-- Inclui: resultados de ações, decisões tomadas, evidências coletadas
-- NÃO inclui: prompts completos, dados redundantes
+## 📐 Políticas por Tipo
 
-### Memória Longa
-- ⚠️ **Armazenar APENAS fatos confirmados por ferramenta**
-- Se uma informação não foi validada, NÃO persistir
-- Evitar duplicação (verificar antes de inserir)
+### 💨 Memória Curta
+- Vive **apenas** durante a execução actual
+- Inclui: resultados de acções, decisões, evidências
+- **Não** inclui: prompts completos, dados redundantes
 
-### Memória Episódica
-- Armazena resumos de execuções, não traces completos
-- Cada episódio contém: situação, ação, resultado, aprendizado
-- Lições devem ser: generalizáveis, acionáveis, baseadas em evidência
+### 📚 Memória Longa
+> ⚠️ Armazenar **APENAS** factos confirmados por ferramenta.
 
-### Memória Contextual
+- Informação não validada → **não** persistir
+- Verificar duplicação antes de inserir
+
+### 🎬 Memória Episódica
+- Resumos de execuções, não traces completos
+- Cada episódio: situação → acção → resultado → aprendizado
+- Lições: generalizáveis, acionáveis, baseadas em evidência
+
+### 🔍 Memória Contextual
 - Indexa fragmentos com embeddings
-- Limite de similaridade (cosseno): **0.7** (ajustável)
+- Similaridade mínima (cosseno): **0.7**
 - Reindex periódico para evitar drift
 
-## Regras de Segurança
+---
 
-🚫 **NUNCA armazenar:**
+## 🚫 Nunca Armazenar
+
 - Senhas, tokens, secrets
-- Dados pessoais identificáveis sem consentimento
-- Informações que possam ficar desatualizadas sem revalidação
+- Dados pessoais sem consentimento
+- Informação desatualizada sem revalidação
 
-## Política de Expiração
+---
+
+## ⏳ Política de Expiração
 
 ```yaml
 memoria_longa:
@@ -58,11 +68,13 @@ memoria_episodica:
   arquivar_apos: 365
 ```
 
-## Recuperação no Loop
+---
 
-Antes do `planner` decidir, o runtime recupera:
-1. Episódios similares (top-3 por similaridade)
-2. Fatos relevantes da memória longa
-3. Lições aprendidas em casos parecidos
+## 🔄 Recuperação no Loop
 
-Esse contexto enriquecido é injetado no prompt do planner.
+Antes do planner decidir, o runtime recupera:
+1. Episódios similares (top-3)
+2. Factos relevantes da memória longa
+3. Lições de casos parecidos
+
+→ Contexto injectado no prompt do planner.

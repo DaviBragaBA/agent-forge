@@ -1,33 +1,43 @@
-# Hooks: {{nome_amigavel}}
+# 📡 Hooks: {{nome_amigavel}}
 
-> Pontos de extensão para observabilidade. Permite interceptar eventos em runtime.
+> **Contrato de observabilidade** — pontos de extensão para interceptar eventos em runtime.
 
-## Hooks Configurados
+---
+
+## 🔗 Hooks Configurados
 
 {{#each hooks}}
 - **{{this.evento}}** → ação: `{{this.acao}}`
 {{/each}}
 
-## Eventos Disponíveis
+---
+
+## 📋 Eventos Disponíveis
 
 | Evento | Quando dispara | Dados disponíveis |
 |--------|---------------|-------------------|
-| `antes_iteracao` | Antes de cada ciclo do loop | iteração, estado |
-| `depois_iteracao` | Após cada ciclo do loop | iteração, decisão, resultado |
+| `antes_iteracao` | Antes de cada ciclo | iteração, estado |
+| `depois_iteracao` | Após cada ciclo | iteração, decisão, resultado |
 | `antes_tool` | Antes de chamar ferramenta | ferramenta, argumentos |
 | `depois_tool` | Após resposta da ferramenta | ferramenta, resultado, latência |
-| `ao_finalizar` | Quando o agent termina | trace completo, output |
-| `ao_falhar` | Quando ocorre erro fatal | erro, estado, último plano |
+| `ao_finalizar` | Agent termina | trace completo, output |
+| `ao_falhar` | Erro fatal | erro, estado, último plano |
 
-## Ações Disponíveis
+---
 
-- **log** — registra no stdout estruturado
-- **alerta** — emite alerta no dashboard
-- **webhook** — POST para URL configurada
+## ⚡ Ações Disponíveis
 
-## Trace Estruturado
+| Ação | Efeito |
+|------|--------|
+| **log** | Registo estruturado no stdout |
+| **alerta** | Alerta no dashboard |
+| **webhook** | POST para URL configurada |
 
-Independente dos hooks, o runtime SEMPRE gera `trace.json` com:
+---
+
+## 📊 Trace Estruturado
+
+O runtime **sempre** gera `trace.json`:
 
 ```json
 {
@@ -52,4 +62,4 @@ Independente dos hooks, o runtime SEMPRE gera `trace.json` com:
 }
 ```
 
-> Logs tradicionais NÃO são suficientes para agents. Use sempre o trace estruturado.
+> Logs tradicionais **não** bastam para agents — use sempre trace estruturado.

@@ -1,11 +1,11 @@
 ---
 name: criador-de-agents
-description: Cria agents autônomos completos via wizard conversacional. Use quando o utilizador pedir "criar um agent", "novo agent", "agent forge", "spec driven agent", ou quiser gerar a estrutura de contratos (agent.md, loop.md, planner.md, skills.md, toolbox.md, executor.md, rules.md, hooks.md, memory.md) para um agent novo. Arquitetura Spec Driven Agents.
+description: Cria agents autônomos completos via wizard conversacional. Use quando o utilizador pedir "criar um agent", "novo agent", "agent forge", "spec driven agent", ou quiser gerar a estrutura de contratos (agent.md, loop.md, planner.md, skills.md, toolbox.md, executor.md, rules.md, hooks.md, memory.md) para um agent novo.
 ---
 
 # Criador de Agents (Agent Forge)
 
-Esta skill conduz um **wizard conversacional** em português que termina com a geração de um agent completo (9 contratos MD + blueprint JSON validado) em `agent-forge/agents/<nome>/`.
+Esta skill conduz um **wizard pedagógico** em português: primeiro entende o **problema**, depois **recomenda** cada decisão com o **porquê**, aguarda **confirmação** e só então **gera** o agent completo (9 contratos MD + blueprint JSON) em `agent-forge/agents/<nome>/`.
 
 ## Quando usar
 
@@ -17,84 +17,208 @@ Acione esta skill QUANDO o utilizador disser algo como:
 - "Spec driven agent"
 - "Wizard de agents"
 
-## Filosofia (ler antes de começar)
+---
+
+## Formato de resposta (obrigatório)
+
+**Nunca** despejar texto corrido branco nem listar 9 ficheiros sem estrutura. **Sempre** usar markdown rico e pedagógico.
+
+### Emojis de secção (conjunto fixo)
+
+| Emoji | Secção |
+|-------|--------|
+| 📋 | `agent.md` — identidade |
+| 🔄 | `loop.md` — ciclo e limites |
+| 🧠 | `planner.md` — decisão |
+| ⚡ | `skills.md` — capacidades |
+| 🧰 | `toolbox.md` — ferramentas autorizadas |
+| ⚙️ | `executor.md` — execução e retry |
+| 🛡️ | `rules.md` — segurança |
+| 📡 | `hooks.md` — observabilidade |
+| 💾 | `memory.md` — memória |
+
+Outros emojis úteis: 📚 (porquê), ✅ (confirmação), ⚠️ (risco), 🎯 (objetivo), 💡 (dica).
+
+### Estrutura mínima de cada resposta do wizard
+
+1. **Cabeçalho** com contexto (`## 🎯 Problema` ou `## 💡 Recomendação`)
+2. **Tabelas** para comparações (tipos de agent, arquiteturas, skills)
+3. **Blockquotes** (`>`) para callouts e avisos
+4. **Labels em negrito** para campos-chave
+5. Secção **`## 📚 Porque escolhi isto`** — obrigatória em toda recomendação
+6. **Pergunta de confirmação** no fim (nunca gerar sem "sim")
+
+### Ao entregar o agent criado
+
+Incluir secção **`## 📦 Os 9 contratos deste agent`** — uma subsecção por ficheiro com emoji, função em 1 linha e **porquê** desta configuração.
+
+---
+
+## Filosofia
 
 > O agent NÃO é código. É uma especificação que um runtime genérico interpreta.
 
 Cada agent tem 9 contratos:
 
-| Ficheiro | Define |
-|----------|--------|
-| `agent.md` | Identidade, tipo, objetivo, formato de saída |
-| `loop.md` | Limites do ciclo (max iterações, critérios de parada) |
-| `planner.md` | Regras de decisão, arquitetura cognitiva |
-| `skills.md` | O que o agent SABE fazer |
-| `toolbox.md` | O que o agent PODE fazer (subconjunto de skills) |
-| `executor.md` | Validação, retry, tratamento de erros |
-| `rules.md` | Limites, restrições, confirmações humanas |
-| `hooks.md` | Observabilidade (eventos) |
-| `memory.md` | Memórias (curta/longa/episódica/contextual) |
+| Ficheiro | Emoji | Define |
+|----------|-------|--------|
+| `agent.md` | 📋 | Identidade, tipo, objetivo, formato de saída |
+| `loop.md` | 🔄 | Limites do ciclo (max iterações, critérios de parada) |
+| `planner.md` | 🧠 | Regras de decisão, arquitetura cognitiva |
+| `skills.md` | ⚡ | O que o agent SABE fazer |
+| `toolbox.md` | 🧰 | O que o agent PODE fazer (subconjunto de skills) |
+| `executor.md` | ⚙️ | Validação, retry, tratamento de erros |
+| `rules.md` | 🛡️ | Limites, restrições, confirmações humanas |
+| `hooks.md` | 📡 | Observabilidade (eventos) |
+| `memory.md` | 💾 | Memórias (curta/longa/episódica/contextual) |
 
-## Fluxo do Wizard
+Referência de formato: `agent-forge/docs/PEDAGOGIA.md`
 
-### Passo 1 — Apresentação (curta)
+---
 
-Dizer ao utilizador, em UMA frase, o que vai acontecer:
-> "Vou fazer-te 7 perguntas e gerar um agent completo com 9 contratos. Pode começar?"
+## Fluxo do Wizard (problema → recomendação → confirmação → geração)
 
-### Passo 2 — Perguntas (UMA por turno, conversacional)
+### Fase 1 — Problema primeiro
 
-Use a ferramenta `AskQuestion` SEMPRE QUE POSSÍVEL. Faça as perguntas na seguinte ordem:
+**Uma pergunta por turno.** Começar pelo problema, não pelo nome técnico.
 
-**P1. Nome e objetivo**
-- "Como vais chamar este agent?" (sugerir kebab-case, ex: `revisor-pr`)
-- "Em uma frase: qual é o OBJETIVO principal deste agent?"
+> **Apresentação (1 frase):** "Vou entender o teu problema, recomendar a arquitetura ideal com o porquê de cada escolha, e só depois gerar os 9 contratos. Podes começar?"
 
-**P2. Tipo de agent** (ler `agent-forge/taxonomies.json > tipos_agent`)
-Apresentar os 4 tipos com descrição curta e perguntar qual encaixa:
-- ⚡ Task-Based — executa tarefa direta
-- 💬 Interativo — pergunta antes de agir
-- 🎯 Goal-Oriented — decompõe objetivos
-- 🤖 Autônomo — reage a eventos
+**P1. Problema e objetivo**
+- "Que **problema** queres resolver?" (deixar o utilizador descrever livremente)
+- "Em **uma frase**: qual seria o **resultado ideal** quando o agent terminar?"
 
-**P3. Arquitetura cognitiva**
-- 🔄 ReAct — pensa e age passo a passo (incerteza)
-- 📋 Plan-and-Execute — planeja tudo antes (processos estruturados)
-- 🪞 Reflection — auto-avalia e refina (qualidade crítica)
+> Bloquear avanço se o objetivo for vago. Pedir exemplos concretos de entrada/saída.
 
-**P4. Skills** (capacidades)
-- Pedir lista de skills (3–7 idealmente). Para cada uma:
-  - Nome (snake_case)
-  - O que faz (1 linha)
-  - Tipo de implementação: mock | rest | database | mcp
-- **Segurança (sugerir automaticamente):** skills com `rest`, `database` ou `mcp` devem entrar em `acoes_com_confirmacao`; skills que escrevem ficheiros ou publicam dados também.
+**P2. Nome (só depois do problema)**
+- Sugerir kebab-case derivado do objetivo (ex: `revisor-pr`, `gerador-prompt`)
+- Confirmar ou ajustar
 
-**P5. Loop**
-- Max iterações (default: 8)
-- Tempo máx em segundos (default: 120)
-- Critérios de parada (já incluir `objetivo_alcancado` e `limite_etapas` por default)
+---
 
-**P6. Regras**
-- Alguma ação que exige CONFIRMAÇÃO humana? (default: incluir skills `rest`/`database`/`mcp` + ações de escrita/publicação)
-- Alguma ação OBRIGATÓRIA antes de finalizar?
-- Algum limite especial (ex: "max 3 chamadas a `buscar_logs`")?
-- **Defaults de segurança** (incluir no blueprint se o utilizador não disser o contrário):
-  - `acoes_com_confirmacao`: skills sensíveis + `executar_shell`, `escrever_ficheiro`, `chamada_rede`, `git_push`
-  - `proibidas`: `publicar_externamente`, `aceder_fora_workspace`, `executar_shell_sem_confirmacao`
+### Fase 2 — Recomendação pedagógica (NÃO perguntar 7 coisas soltas)
 
-**P7. Memória** (perguntar simples — sim/não para cada)
-- Memória curta: SIM (sempre)
-- Longa: precisa lembrar fatos entre execuções?
-- Episódica: precisa lembrar execuções passadas?
-- Contextual (embeddings): precisa busca por significado?
+Depois de P1+P2, o assistente **recomenda** um blueprint completo numa **única resposta estruturada**. O utilizador confirma ou ajusta — não interrogar item a item.
 
-### Passo 3 — Mostrar resumo
+Ler `agent-forge/taxonomies.json` antes de recomendar.
 
-Apresentar uma tabela com tudo que foi capturado. Perguntar: "Confirma?"
+#### Template da resposta de recomendação
 
-### Passo 4 — Gerar blueprint JSON
+```markdown
+## 💡 Recomendação para `<nome-sugerido>`
 
-Construa um JSON conforme `agent-forge/blueprint.schema.json`. Estrutura mínima:
+> Resumo em 2 linhas do que este agent fará e para quem.
+
+---
+
+### 🎯 Objetivo proposto
+
+**Objetivo:** ...
+**Contrato de saída:** formato + campos obrigatórios
+
+---
+
+### 📊 Comparação: 4 tipos de agent
+
+| Tipo | Emoji | Ideal para | Porque NÃO neste caso |
+|------|-------|------------|------------------------|
+| Task-Based | ⚡ | ... | ... |
+| Interativo | 💬 | ... | ... |
+| Goal-Oriented | 🎯 | ... | ... |
+| Autônomo | 🤖 | ... | ... |
+
+**✅ Recomendo:** `<tipo>` — *uma linha de justificação*
+
+---
+
+### 🧠 Arquitetura cognitiva
+
+| Arquitetura | Emoji | Vantagem | Desvantagem |
+|-------------|-------|----------|-------------|
+| ReAct | 🔄 | ... | ... |
+| Plan-and-Execute | 📋 | ... | ... |
+| Reflection | 🪞 | ... | ... |
+
+**✅ Recomendo:** `<arquitetura>` — *porquê para ESTE problema*
+
+---
+
+### ⚡ Skills propostas
+
+| Skill | Tipo | O que faz | Porque incluir |
+|-------|------|-----------|----------------|
+| `skill_a` | mock | ... | ... |
+| `skill_b` | rest | ... | ... |
+
+---
+
+### 🧰 Toolbox (subconjunto autorizado)
+
+| Na toolbox | Fora da toolbox | Porquê |
+|------------|-----------------|--------|
+| ✅ `skill_a` | ❌ `skill_c` | ... |
+
+> **Princípio:** skill = sabe; toolbox = pode agora.
+
+---
+
+### 🔄 Loop proposto
+
+| Parâmetro | Valor | Porquê |
+|-----------|-------|--------|
+| Max iterações | 8 | ... |
+| Tempo máx (s) | 120 | ... |
+| Critérios de parada | objetivo_alcancado, limite_etapas | ... |
+
+---
+
+### 💾 Memória proposta
+
+| Tipo | Habilitar? | Porquê |
+|------|------------|--------|
+| Curta | ✅ sempre | estado da execução |
+| Longa | sim/não | ... |
+| Episódica | sim/não | ... |
+| Contextual | sim/não | ... |
+
+---
+
+### 🛡️ Regras de segurança
+
+| Categoria | Itens | Porquê |
+|-----------|-------|--------|
+| Confirmação | executar_shell, escrever_ficheiro, ... | ... |
+| Proibidas | publicar_externamente, ... | ... |
+| Obrigatórias | (se houver) | ... |
+
+---
+
+## 📚 Porque escolhi isto
+
+Parágrafo curto que **ensina**: porque este tipo vs os outros, porque esta arquitetura, porque cada skill, porque este subconjunto na toolbox, porque estes limites de loop, porque este perfil de memória.
+
+---
+
+**Confirma esta recomendação?** Podes dizer "sim", pedir ajustes ("menos skills", "tipo interativo") ou responder ponto a ponto.
+```
+
+**Regras da recomendação:**
+- Cada linha "Recomendo" deve explicar **porque não** as alternativas
+- Skills `rest`/`database`/`mcp` → incluir em `acoes_com_confirmacao`
+- Defaults de segurança se o utilizador não disser o contrário
+- **Nunca gerar** antes de confirmação explícita
+
+---
+
+### Fase 3 — Resumo final (após ajustes)
+
+Tabela compacta de tudo capturado + última pergunta "Confirma geração?"
+
+---
+
+### Fase 4 — Gerar blueprint JSON
+
+Construir JSON conforme `agent-forge/blueprint.schema.json`. Estrutura mínima:
 
 ```json
 {
@@ -162,9 +286,9 @@ Construa um JSON conforme `agent-forge/blueprint.schema.json`. Estrutura mínima
 
 Salvar em `agent-forge/agents/<nome>/blueprint.json`.
 
-### Passo 5 — Gerar contratos + runtime + UI
+---
 
-Executar no shell (**sempre com `--runtime`** para poder executar o agent):
+### Fase 5 — Gerar contratos + runtime + UI
 
 ```bash
 cd agent-forge
@@ -172,79 +296,112 @@ pip install -r scripts/requirements.txt
 python scripts/generate.py -b agents/<nome>/blueprint.json --runtime
 ```
 
-Isto gera:
-- 9 MD legíveis na raiz do agent
-- `contracts/` com YAML para o runtime Python
-- Atualiza `web/src/data/agents.ts` (lista na UI `/agents`)
-
 Só exportar runtime (sem regenerar templates):
 
 ```bash
 python scripts/export_runtime_contracts.py -b agents/<nome>/blueprint.json
 ```
 
-### Passo 6 — Validar (dois validadores)
+---
 
-**Agent Forge** (blueprint + consistência):
+### Fase 6 — Validar
+
+**Agent Forge:**
 
 ```bash
 python scripts/validate.py agents/<nome>/
 ```
 
-**Runtime Python** (YAML nos MD + toolbox ↔ skills):
+**Runtime oficial:**
 
 ```bash
 cd runtime
 python main.py validar --agente ../agents/<nome>
 ```
 
-Mostrar ambos os relatórios. Se algum falhar, corrigir o `blueprint.json` e re-rodar o passo 5.
+Mostrar relatórios em tabela. Se falhar, corrigir blueprint e re-rodar fase 5.
 
-### Passo 7 — Próximos passos
+---
 
-### Passo 7 — Executar (Runtime Cursor, sem API key)
+### Fase 7 — Entrega rica ao utilizador
 
-No chat do Cursor (usa a subscrição que já tens — **sem OpenAI API**):
+Usar este template (adaptar valores):
 
+```markdown
+## ✅ Agent `<nome>` criado com sucesso
+
+> `<descricao curta>`
+
+| Item | Valor |
+|------|-------|
+| 📁 Pasta | `agent-forge/agents/<nome>/` |
+| 📋 Tipo | `<tipo>` |
+| 🧠 Arquitetura | `<arquitetura>` |
+| ⚡ Skills | N (toolbox: M) |
+
+---
+
+## 📦 Os 9 contratos deste agent
+
+### 📋 agent.md
+**Função:** identidade, objetivo, contrato de saída.
+**Nesta config:** ...
+
+### 🔄 loop.md
+**Função:** limites e parada.
+**Nesta config:** max N iterações porque ...
+
+(... repetir para os 9 ficheiros ...)
+
+---
+
+## 📚 Porque escolhi isto
+
+Resumo pedagógico das decisões principais.
+
+---
+
+## 🚀 Próximos passos
+
+1. **Executar no Cursor:** `executar <nome>: <entrada de exemplo>`
+2. **UI web:** `cd agent-forge/web && npm run dev` → `/agents`
+3. **Iterar:** editar `blueprint.json` → `generate.py -b ... --runtime`
+
+> Skill de execução: **`executar-agent`**. Docs: `agent-forge/docs/RUNTIME-CURSOR.md`.
 ```
-executar <nome>: <entrada>
-```
 
-Exemplo: `executar gerador-prompt: Prompt para revisar PRs em Python`
+**Proibido na entrega:** colar os 9 MD completos no chat. Apontar para a pasta e explicar cada um.
 
-Skill: **`executar-agent`**. Documentação: `agent-forge/docs/RUNTIME-CURSOR.md`.
-
-Apresentar também:
-- 📁 Pasta: `agent-forge/agents/<nome>/` (+ `contracts/`)
-- 📄 Contratos gerados e validados
-- 🌐 UI: `cd agent-forge/web && npm run dev` → `/agents` e `/tutorial`
-- 🔄 Iterar: editar `blueprint.json` → `generate.py -b ... --runtime`
-
-**Opcional (runtime Python):** `runtime/main.py rodar` requer `OPENAI_API_KEY` — **não** é o fluxo normal.
+---
 
 ## Regras de qualidade
 
-1. **Nunca gerar agent sem objetivo claro** — bloquear na P1 até ter resposta sólida.
-2. **Skills obrigatórias** devem existir nas skills declaradas (validar antes de gerar).
-3. **Toolbox** deve ser subconjunto de skills.
-4. **Loop** sempre com pelo menos `objetivo_alcancado` ou `limite_etapas`.
-5. **Memória longa** sempre com aviso: "armazene APENAS fatos confirmados por ferramenta".
-6. **Idioma:** tudo em português (PT-BR/PT-PT é indiferente, manter consistente).
-7. **Segurança:** todo blueprint inclui `acoes_com_confirmacao` para ferramentas de risco e `proibidas` baseline; o runtime Cursor aplica confirmação extra (skill `executar-agent`).
-8. **Se Python não estiver disponível:** gerar os ficheiros MD manualmente usando os templates em `agent-forge/templates/` + substituição de placeholders.
+1. **Problema antes de specs** — nunca saltar para kebab-case sem entender o objetivo.
+2. **Recomendar, não interrogar** — fase 2 é uma proposta ensinada, não 7 perguntas soltas.
+3. **📚 Porque escolhi isto** — obrigatório em recomendação e entrega final.
+4. **Skills obrigatórias** existem nas skills declaradas.
+5. **Toolbox** = subconjunto de skills.
+6. **Loop** com pelo menos `objetivo_alcancado` ou `limite_etapas`.
+7. **Memória longa** — avisar: "armazene APENAS fatos confirmados por ferramenta".
+8. **Idioma:** português consistente.
+9. **Segurança:** `acoes_com_confirmacao` + `proibidas` baseline.
+10. **Sem Python:** gerar MD manualmente com `agent-forge/templates/` + placeholders.
 
 ## Anti-padrões
 
-- ❌ Gerar um agent "que faz tudo" — focar num objetivo único e claro.
-- ❌ Listar 20 skills — manter entre 3 e 7 para o MVP.
-- ❌ Saltar a validação — sempre executar `validate.py` **e** `runtime/main.py validar`.
-- ❌ Esquecer `--runtime` — sem isso o agent não exporta contratos YAML para o runtime Python.
-- ❌ Hardcoded de provider — usar `auto` por default.
+- ❌ Muro de texto branco sem headers/tabelas
+- ❌ Listar 9 ficheiros MD crus no chat
+- ❌ Gerar sem confirmação explícita
+- ❌ Perguntar tipo/arquitetura/skills um a um sem explicar alternativas
+- ❌ Agent "que faz tudo" — um objetivo claro
+- ❌ 20 skills — manter 3–7 no MVP
+- ❌ Saltar validação ou `--runtime`
 
 ## Referências
 
-- `agent-forge/README.md` — visão geral do projeto
-- `agent-forge/blueprint.schema.json` — schema completo
-- `agent-forge/taxonomies.json` — taxonomias (tipos, arquiteturas, adapters, memórias)
+- `agent-forge/docs/PEDAGOGIA.md` — guia de formato pedagógico
+- `agent-forge/README.md` — visão geral
+- `agent-forge/blueprint.schema.json` — schema
+- `agent-forge/taxonomies.json` — tipos, arquiteturas, adapters
 - `agent-forge/templates/*.template` — templates dos 9 contratos
-- `agent-forge/docs/SEGURANCA.md` — confirmação humana e ações de risco
+- `agent-forge/docs/SEGURANCA.md` — confirmação humana

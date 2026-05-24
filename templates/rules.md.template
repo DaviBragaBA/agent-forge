@@ -1,20 +1,24 @@
-# Rules: {{nome_amigavel}}
+# 🛡️ Rules: {{nome_amigavel}}
 
-> Limites, restrições e regras de segurança.
-> Este é o principal mecanismo de PROTEÇÃO do agent.
+> **Contrato de segurança** — limites, confirmações humanas e ações proibidas.
+> Principal mecanismo de **proteção** do agent.
 
-## Limites por Ferramenta
+---
+
+## 📊 Limites por Ferramenta
 
 {{#each rules.limites_ferramenta}}
 - `{{this.ferramenta}}` — máximo **{{this.max_chamadas}}** chamadas por execução
 {{/each}}
 
-## Ações que Exigem Confirmação Humana
+---
 
-Antes de executar, o planner deve escolher `PERGUNTAR_USUARIO`, resumir a ação e o risco, e **aguardar sim explícito**.
+## ⚠️ Ações que Exigem Confirmação Humana
+
+Antes de executar, o planner escolhe `PERGUNTAR_USUARIO`, resume a ação e o risco, e **aguarda sim explícito**.
 
 {{#each rules.acoes_com_confirmacao}}
-- ⚠️ `{{this}}` — requer confirmação explícita do utilizador antes de executar
+- ⚠️ `{{this}}` — requer confirmação explícita
 {{/each}}
 
 ### Política de confirmação (runtime)
@@ -23,13 +27,13 @@ Antes de executar, o planner deve escolher `PERGUNTAR_USUARIO`, resumir a ação
 politica_confirmacao:
   obrigatoria: true
   decisao_planner: PERGUNTAR_USUARIO
-  aceitar_apenas:
+  aceitar_apenas:           # respostas válidas
     - sim
     - yes
     - confirmo
     - podes executar
   nunca_assumir_consentimento: true
-  acoes_isentas:
+  acoes_isentas:            # read-only, sem side-effects
     - read
     - grep
     - list_dir
@@ -44,40 +48,48 @@ politica_confirmacao:
     secrets: aceder_secrets_env
 ```
 
-## Ações Obrigatórias
+---
 
-O agent NÃO pode finalizar sem ter executado:
+## 📌 Ações Obrigatórias
+
+O agent **NÃO** pode finalizar sem ter executado:
 
 {{#each rules.obrigatorias}}
 - 📌 `{{this}}`
 {{/each}}
 
-## Ações Proibidas
+---
 
-NUNCA executar:
+## 🚫 Ações Proibidas
+
+**NUNCA** executar:
 
 {{#each rules.proibidas}}
 - 🚫 `{{this}}`
 {{/each}}
 
-## Regras de Segurança Universais
+---
 
-Independente do agent, estas regras SEMPRE se aplicam:
+## 🌐 Regras Universais de Segurança
 
-1. **Nunca armazenar credenciais** em memória, trace ou contratos
-2. **Nunca executar SQL não parametrizado**
-3. **Nunca chamar APIs sem timeout**
-4. **Nunca finalizar sem registrar resultado**
-5. **Nunca ignorar erros silenciosamente**
-6. **Nunca executar Shell, escrita, rede ou MCP externo sem confirmação humana**
-7. **Nunca aceder a ficheiros ou serviços fora do workspace** sem autorização
+Independente do agent:
 
-## O que acontece se uma regra for violada?
+1. **Nunca** armazenar credenciais em memória ou trace
+2. **Nunca** executar SQL não parametrizado
+3. **Nunca** chamar APIs sem timeout
+4. **Nunca** finalizar sem registrar resultado
+5. **Nunca** ignorar erros silenciosamente
+6. **Nunca** Shell/escrita/rede/MCP externo **sem confirmação humana**
+7. **Nunca** aceder fora do workspace sem autorização
 
-| Violação | Ação |
-|----------|------|
-| Limite excedido | Aviso + recusa da chamada |
-| Ação obrigatória ignorada | Recusa de finalização |
-| Ação proibida tentada | Bloqueio imediato + trace de violação |
-| Confirmação não dada | Pausa aguardando humano (`PERGUNTAR_USUARIO`) |
-| Confirmação negada | Encerrar etapa ou propor alternativa segura |
+---
+
+## ⚖️ Consequências de Violação
+
+| Violação | Ação do runtime |
+|----------|-----------------|
+| Limite excedido | Aviso + recusa |
+| Obrigatória ignorada | Recusa de finalização |
+| Proibida tentada | Bloqueio + trace |
+| Confirmação pendente | Pausa (`PERGUNTAR_USUARIO`) |
+| Confirmação negada | Encerrar ou alternativa segura |

@@ -1,25 +1,31 @@
-# Loop: {{nome_amigavel}}
+# 🔄 Loop: {{nome_amigavel}}
 
-> Controle do Agent Loop. Define limites e critérios de parada.
+> **Contrato de ciclo** — controla iterações, tempo e critérios de parada.
 > Sem critério de parada, o agent pode entrar em execução infinita.
 
-## Limites de Execução
+---
+
+## ⚙️ Limites de Execução
 
 ```yaml
-max_iteracoes: {{loop.max_iteracoes}}
-tempo_max_segundos: {{loop.tempo_max_segundos}}
-tokens_max: {{loop.tokens_max}}
+max_iteracoes: {{loop.max_iteracoes}}       # máximo de ciclos PERCEBER→PLANEJAR→AGIR→AVALIAR
+tempo_max_segundos: {{loop.tempo_max_segundos}}  # timeout global da execução
+tokens_max: {{loop.tokens_max}}             # teto de consumo estimado
 ```
 
-## Critérios de Parada
+---
 
-O agent encerra a execução quando QUALQUER um destes critérios for atendido:
+## 🛑 Critérios de Parada
+
+O agent encerra quando **qualquer** critério abaixo for atendido:
 
 {{#each loop.criterios_parada}}
 - ✅ **{{this}}**
 {{/each}}
 
-## Fluxo
+---
+
+## 🔁 Fluxo do Ciclo
 
 ```
 PERCEBER → RACIOCINAR → AGIR → AVALIAR
@@ -28,10 +34,14 @@ PERCEBER → RACIOCINAR → AGIR → AVALIAR
        objetivo não alcançado
 ```
 
-## Detecção de Loops Improdutivos
+---
 
-Se 3 iterações consecutivas:
-- Não produzirem novo conhecimento, OU
+## ⚡ Detecção de Loops Improdutivos
+
+> **Circuit Breaker:** interrompe execuções que não avançam.
+
+Se **3 iterações consecutivas**:
+- Não produzirem novo conhecimento, **ou**
 - Repetirem a mesma ação com os mesmos argumentos
 
-→ O Circuit Breaker é acionado e o agent é interrompido com status `falta_progresso`.
+→ Status `falta_progresso` + trace de diagnóstico.

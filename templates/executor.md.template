@@ -1,21 +1,27 @@
-# Executor: {{nome_amigavel}}
+# ⚙️ Executor: {{nome_amigavel}}
 
-> Como as ações são executadas. Garante segurança e consistência.
+> **Contrato de execução** — valida, executa e classifica resultados de cada skill.
 
-## Validações Pré-execução
+---
 
-1. **Validação de payload** — tipos, estrutura, compatibilidade com a interface da skill
-2. **Verificação de toolbox** — a ferramenta está autorizada?
-3. **Verificação de limites** — `rules.md` permite esta chamada?
-4. **Resolução de adapter** — qual implementação real será chamada?
+## 🔍 Validações Pré-execução
 
-Se qualquer validação falhar, a execução é INTERROMPIDA com erro estruturado.
+| # | Validação | Se falhar |
+|---|-----------|-----------|
+| 1 | **Payload** — tipos e estrutura | Erro `validacao_falhou` |
+| 2 | **Toolbox** — ferramenta autorizada? | Erro `tool_not_allowed` |
+| 3 | **Limites** — `rules.md` permite? | Recusa + aviso |
+| 4 | **Adapter** — implementação resolvida? | Erro de configuração |
 
-## Política de Retry
+> Qualquer falha **interrompe** a execução — nunca continuar silenciosamente.
+
+---
+
+## 🔁 Política de Retry
 
 ```yaml
 max_tentativas: 3
-backoff: exponencial    # 1s, 2s, 4s
+backoff: exponencial          # 1s → 2s → 4s
 retry_em:
   - timeout
   - rate_limit
@@ -26,25 +32,31 @@ nao_retry_em:
   - tool_not_allowed
 ```
 
-## Timeout por Ferramenta
+---
 
-Default: **30s**. Pode ser sobrescrito por skill.
+## ⏱️ Timeout por Ferramenta
 
-## Classificação de Resultado
+```yaml
+default_segundos: 30          # sobrescrevível por skill
+```
 
-Cada execução é classificada como:
+---
+
+## 📊 Classificação de Resultado
 
 | Status | Significado | Próxima ação |
 |--------|-------------|--------------|
-| `completo` | Ação bem-sucedida, dados completos | Continua o loop |
-| `parcial` | Ação executou, mas dados incompletos | Decide se replanea |
-| `falho` | Ação falhou após retries | Aciona fallback ou Circuit Breaker |
+| `completo` | Sucesso, dados completos | Continua o loop |
+| `parcial` | Executou, dados incompletos | Replaneia ou continua |
+| `falho` | Falhou após retries | Fallback ou Circuit Breaker |
 
-## Circuit Breaker
+---
+
+## ⚡ Circuit Breaker
 
 Acionado quando:
-- 3 falhas consecutivas da MESMA ferramenta
+- 3 falhas consecutivas da **mesma** ferramenta
 - Resposta inválida da LLM 2x seguidas
-- Estrutura malformada do plano
+- Plano malformado
 
-Ação: interrompe execução com resultado controlado e gera trace de diagnóstico.
+→ Interrompe com resultado controlado + trace de diagnóstico.

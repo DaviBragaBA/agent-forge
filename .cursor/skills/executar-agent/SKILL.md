@@ -1,6 +1,6 @@
 ---
 name: executar-agent
-description: Executa um agent Agent Forge no Cursor sem API key — interpreta os contratos MD/YAML e corre o ciclo ReAct no chat. Use quando o utilizador disser "executar agent", "rodar agent", "usa o gerador-prompt", "gerador-prompt:", "doc-tutor:", ou quiser usar um agent forjado sem python main.py nem OpenAI.
+description: Executa um agent Agent Forge no Cursor sem API key — interpreta os contratos MD/YAML e corre o ciclo ReAct no chat. Use quando o utilizador disser "executar agent", "rodar agent", "usa o gerador-prompt", "gerador-prompt:", "pos-ia-tutor:", ou quiser usar um agent forjado sem python main.py nem OpenAI.
 ---
 
 # Executar Agent (Runtime Cursor)
@@ -10,22 +10,80 @@ description: Executa um agent Agent Forge no Cursor sem API key — interpreta o
 ## Quando usar
 
 - "Executa o gerador-prompt"
-- "Rodar agent doc-tutor com entrada: ..."
+- "Rodar agent pos-ia-tutor com entrada: ..."
 - "Usa o agent X para ..."
 - Qualquer pedido que referencie `agent-forge/agents/<nome>/`
 
+---
+
+## Formato de resposta (obrigatório)
+
+**Nunca** entregar só texto corrido ou um bloco `--- trace ---` minimalista. **Sempre** markdown rico e pedagógico.
+
+### Emojis de secção (mesmo conjunto do criador)
+
+| Emoji | Uso |
+|-------|-----|
+| 👁️ | PERCEBER — o que foi entendido |
+| 🧠 | PLANEJAR — decisão e raciocínio |
+| ⚡ | AGIR — skill executada |
+| ✅ | AVALIAR — progresso e próximo passo |
+| 📦 | Entrega final (contrato de saída) |
+| 📡 | Trace / observabilidade |
+| 📚 | Porque fiz isto (pedagogia) |
+| ⚠️ | Confirmação de segurança |
+
+### Durante o ciclo ReAct
+
+Mostrar **cada etapa** num bloco escaneável (não esconder o raciocínio):
+
+```markdown
+### 🔄 Etapa N — `<PERCEBER | PLANEJAR | AGIR | AVALIAR>`
+
+| Campo | Valor |
+|-------|-------|
+| **Fase** | PERCEBER |
+| **O que sei** | ... |
+| **O que falta** | ... |
+
+> **📚 Decisão:** porque esta fase importa agora.
+```
+
+### Entrega final
+
+1. Cabeçalho `## 📦 Resultado — <nome do agent>`
+2. Artefato no formato de `contrato_saida` (campos obrigatórios em subsecções)
+3. Secção `## 📚 Porque fiz isto` — explica decisões do ciclo
+4. Secção `## 📡 Trace da execução` — tabela pedagógica (não JSON cru)
+
+Referência: `agent-forge/docs/PEDAGOGIA.md`
+
+---
+
 ## Filosofia
 
-O agent **não está no Python** — está na **especificação**. Lê os contratos e **executa o ciclo ReAct** no chat, usando ferramentas reais do Cursor (Read, Grep, Shell) quando a skill pedir dados reais.
+O agent **não está no Python** — está na **especificação**. Lê os contratos e **simula o runtime** no chat, usando ferramentas reais do Cursor quando a skill pedir dados reais.
 
 ---
 
 ## Passo 0 — Resolver qual agent
 
 1. Se o utilizador disser o nome (`gerador-prompt`, `doc-tutor`), usa esse.
-2. Senão, lista `agent-forge/agents/*/blueprint.json` e pergunta qual (ou o mais óbvio pelo contexto).
+2. Senão, lista `agent-forge/agents/*/blueprint.json` e pergunta qual.
 
 Pasta base: `agent-forge/agents/<nome>/`
+
+Apresentar brevemente:
+
+```markdown
+## 🚀 Executando agent `<nome>`
+
+| Campo | Valor |
+|-------|-------|
+| **Tipo** | ... |
+| **Arquitetura** | ... |
+| **Entrada** | ... |
+```
 
 ---
 
@@ -43,122 +101,152 @@ Lê **antes** de agir:
 | `skills.md` | Interfaces das skills |
 | `rules.md` | Obrigatórias, limites, políticas |
 
-Validação rápida (sem API, opcional mas recomendado na 1ª execução):
+Validação rápida (opcional na 1ª execução):
 
 ```bash
 cd agent-forge && python scripts/validate.py agents/<nome>/
 cd agent-forge/runtime && python main.py validar --agente ../agents/<nome>
 ```
 
-Se falhar, corrige o blueprint antes de executar.
-
 ---
 
 ## Passo 2 — Ciclo ReAct (tu és o motor)
 
-Repete até **objetivo alcançado** ou **max_iteracoes** (de `loop` / `rules`):
+Repete até **objetivo alcançado** ou **max_iteracoes**:
 
 ```
 PERCEBER → PLANEJAR → AGIR → AVALIAR
 ```
 
-### PERCEBER
+### 👁️ PERCEBER
 
 - Entrada do utilizador + histórico desta conversa.
-- Tipo do agent (`interactive`, `task-based`, etc.) do `agent.md`.
+- Tipo do agent do `agent.md`.
 
-### PLANEJAR (decisão interna — segue planner.md)
+**Mostrar ao utilizador:** o que foi compreendido, o que falta, nível de confiança.
+
+### 🧠 PLANEJAR (segue planner.md)
 
 Escolhe **exactamente uma**:
 
 | proxima_acao | Quando |
 |--------------|--------|
-| `PERGUNTAR_USUARIO` | Tipo interactive e falta info crítica; **ou** ação potencialmente perigosa (ver Confirmação de segurança) |
-| `CHAMAR_FERRAMENTA` | Próxima skill da toolbox ainda não satisfeita **e** confirmação obtida se necessária |
+| `PERGUNTAR_USUARIO` | Tipo interactive e falta info; **ou** ação perigosa |
+| `CHAMAR_FERRAMENTA` | Próxima skill da toolbox **e** confirmação se necessária |
 | `FINALIZAR` | Objetivo atingido E regras obrigatórias cumpridas |
 
-**Nunca** saltar `ferramentas_obrigatorias` de `rules.md` antes de FINALIZAR.
+**Mostrar:** raciocínio explícito, ferramenta escolhida, critério de sucesso.
+
+> **📚 Porque esta ação:** explicar em 1–2 frases a escolha vs alternativas.
+
+**Nunca** saltar `ferramentas_obrigatorias` antes de FINALIZAR.
 
 ---
 
 ## Confirmação de segurança (obrigatório)
 
-Antes de **qualquer** ação abaixo, escolhe `PERGUNTAR_USUARIO`, apresenta um resumo claro do que vai correr e o **nível de risco**, e **aguarda confirmação explícita** (`sim`, `yes`, `confirmo`, `podes executar`). Sem isso, **não avances**.
+Antes de Shell, escrita, rede, MCP externo, git push ou secrets → `PERGUNTAR_USUARIO`:
 
-### Exige confirmação
+```markdown
+## ⚠️ Confirmação necessária
 
-| Categoria | Exemplos no Cursor |
-|-----------|-------------------|
-| **Shell** | `Shell`, scripts, `pip install`, `npm run`, builds, deletes via terminal |
-| **Escrita / remoção** | `Write`, `StrReplace`, `Delete`, editar ficheiros |
-| **Rede** | `curl`, `wget`, `fetch`, skills **rest**, APIs externas |
-| **MCP externo** | `CallMcpTool` para serviços fora do workspace (Stripe, Supabase, etc.) |
-| **Git destrutivo / remoto** | `git push`, `git reset --hard`, force push |
-| **Publicação** | `npm publish`, deploy, webhooks que alteram sistemas externos |
-| **Secrets / env** | Ler ou usar `.env`, chaves API, tokens, credenciais |
-
-Também aplica a skills listadas em `rules.md > acoes_sensiveis` / `blueprint.rules.acoes_com_confirmacao`.
-
-### Isento de confirmação (seguro)
-
-- `Read`, `Grep`, `Glob`, listagens read-only
-- Simulação de skills **mock** (sem side-effects reais)
-- Validação local (`validate.py`) se **não** alterar ficheiros
-
-### Formato da confirmação
-
-```
-⚠️ Confirmação necessária
-
-Ação: <o que vai executar, em linguagem clara>
-Risco: baixo | médio | alto
-Impacto: <ficheiros, rede, dados afetados>
+| Campo | Valor |
+|-------|-------|
+| **Ação** | ... |
+| **Risco** | baixo \| médio \| alto |
+| **Impacto** | ficheiros / rede / dados afetados |
 
 Confirmas? (sim/não)
 ```
 
-**Proibido:** assumir consentimento, interpretar silêncio como sim, ou executar "só para testar".
+Também aplica a `rules.md > acoes_com_confirmacao`.
 
-### AGIR — executar skills
+**Isento:** Read, Grep, Glob, mock sem side-effects.
 
-Para cada skill em `toolbox`:
+**Proibido:** assumir consentimento ou interpretar silêncio como sim.
+
+---
+
+### ⚡ AGIR — executar skills
 
 | tipo_implementacao | Como executar no Cursor |
 |--------------------|-------------------------|
-| **mock** | Tu produces a saída conforme `skills.md` (entrada/saída), de forma realista e coerente com a entrada |
-| **rest/database/mcp** | Usa ferramentas reais (Read, Grep, Shell, MCP) se configurado; senão simula e avisa |
+| **mock** | Produz saída conforme `skills.md`, realista e coerente |
+| **rest/database/mcp** | Ferramentas reais se disponíveis; senão simula e avisa |
 
-**Limites:** respeita `rules.limites` / `limites_ferramenta` do blueprint.
+**Mostrar após cada skill:**
 
-### AVALIAR
+```markdown
+### ⚡ Skill `nome_da_skill`
+
+| Campo | Valor |
+|-------|-------|
+| **Entrada** | ... |
+| **Saída** | ... |
+| **Status** | completo \| parcial \| falho |
+
+> **📚 O que aprendemos:** ...
+```
+
+Respeita `rules.limites_ferramenta`.
+
+### ✅ AVALIAR
 
 - Objetivo mais próximo?
-- Repetição sem progresso (3x → parar com resumo)?
+- Repetição sem progresso (3x → parar)?
 - Skill obrigatória em falta?
+
+**Mostrar:** tabela de progresso e decisão de continuar ou finalizar.
 
 ---
 
 ## Passo 3 — Entrega final (contrato de saída)
 
-Quando `FINALIZAR`, entrega artefato no formato de `contrato_saida` do blueprint.
+Quando `FINALIZAR`:
 
-**Exemplo `gerador-prompt`:** markdown com `titulo`, `prompt_system`, `prompt_user`, `variaveis`, `checklist_qualidade`, `dicas_uso`.
+```markdown
+## 📦 Resultado — `<nome>`
 
-**Exemplo `doc-tutor`:** markdown com `titulo`, `conteudo`, `fontes`, `proxima_acao_sugerida`.
+> Objetivo alcançado: ...
+
+### `<campo_obrigatorio_1>`
+...
+
+### `<campo_obrigatorio_2>`
+...
 
 ---
 
-## Passo 4 — Trace (observabilidade)
+## 📚 Porque fiz isto
 
-No fim, bloco curto:
-
+Explicação pedagógica: porque estas skills, porque esta ordem, como o contrato de saída foi satisfeito.
 ```
---- trace ---
-agent: <nome>
-etapas: N
-ferramentas: skill1 → skill2 → ...
-status: objetivo_alcancado | limite_etapas | falta_progresso
+
+Adaptar campos ao `contrato_saida` do blueprint (ex.: `gerador-prompt` → titulo, prompt_system, etc.).
+
 ---
+
+## Passo 4 — Trace pedagógico
+
+**Substituir** o bloco minimalista antigo por tabela rica:
+
+```markdown
+## 📡 Trace da execução
+
+| # | Fase | Ação | Resultado | 📚 Lição |
+|---|------|------|-----------|----------|
+| 1 | PERCEBER | Entrada analisada | OK | ... |
+| 2 | PLANEJAR | CHAMAR_FERRAMENTA → `skill_x` | OK | ... |
+| 3 | AGIR | `skill_x` executada | completo | ... |
+| 4 | AVALIAR | Objetivo parcial | continuar | ... |
+
+| Métrica | Valor |
+|---------|-------|
+| **Agent** | `<nome>` |
+| **Etapas** | N |
+| **Ferramentas** | skill1 → skill2 → ... |
+| **Status** | objetivo_alcancado \| limite_etapas \| falta_progresso |
+| **Tokens (estim.)** | ... |
 ```
 
 ---
@@ -167,7 +255,7 @@ status: objetivo_alcancado | limite_etapas | falta_progresso
 
 ```
 executar gerador-prompt: Quero um prompt para revisar PRs em Python
-executar doc-tutor: Explica ReAct com base nos documentos do projeto
+rodar doc-tutor: Resume o capítulo sobre ReAct
 executar agent gerador-prompt
 ```
 
@@ -177,21 +265,23 @@ Parseia tudo depois de `:` como **entrada**.
 
 ## Proibido
 
-- ❌ Pedir `OPENAI_API_KEY` ou mandar correr `main.py rodar` como passo **obrigatório**
+- ❌ Muro de texto sem headers/tabelas
+- ❌ Trace de uma linha sem explicação pedagógica
+- ❌ Pedir `OPENAI_API_KEY` ou `main.py rodar` como passo obrigatório
 - ❌ Ignorar `rules.md` ou skills obrigatórias
 - ❌ Inventar ferramentas fora da toolbox
-- ❌ Mais de 7 skills numa execução inventada (usa só as do contrato)
-- ❌ Executar Shell, escrita, rede, MCP externo ou git push **sem confirmação explícita**
+- ❌ Shell/escrita/rede/MCP/git push **sem confirmação explícita**
 - ❌ Aceder a secrets ou publicar fora do workspace sem autorização
 
 ## Opcional (debug)
 
-`python main.py rodar` em `agent-forge/runtime/` só se o utilizador **explicitamente** quiser testar o runtime Python com API — **não** é o fluxo default.
+`python main.py rodar` em `agent-forge/runtime/` só se o utilizador **explicitamente** quiser testar com API.
 
 ---
 
 ## Referências
 
+- `agent-forge/docs/PEDAGOGIA.md`
 - `agent-forge/docs/RUNTIME-CURSOR.md`
 - `agent-forge/docs/SEGURANCA.md`
 - Skill irmã: `criador-de-agents`
