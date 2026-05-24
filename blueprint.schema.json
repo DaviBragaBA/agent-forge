@@ -107,7 +107,8 @@
         },
         "acoes_com_confirmacao": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": { "type": "string" },
+          "description": "Skills ou ações (ex: executar_shell, escrever_ficheiro, chamada_rede, git_push) que exigem PERGUNTAR_USUARIO e confirmação explícita antes de executar. Skills rest/database/mcp devem ser incluídas."
         },
         "obrigatorias": {
           "type": "array",
@@ -116,7 +117,18 @@
         },
         "proibidas": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": { "type": "string" },
+          "description": "Ações bloqueadas (ex: publicar_externamente, aceder_fora_workspace, executar_shell_sem_confirmacao)"
+        },
+        "politica_confirmacao": {
+          "type": "object",
+          "description": "Política opcional de confirmação humana; defaults aplicados pelo runtime se omitida",
+          "properties": {
+            "obrigatoria": { "type": "boolean", "default": true },
+            "decisao_planner": { "type": "string", "enum": ["PERGUNTAR_USUARIO"], "default": "PERGUNTAR_USUARIO" },
+            "aceitar_apenas": { "type": "array", "items": { "type": "string" } },
+            "nunca_assumir_consentimento": { "type": "boolean", "default": true }
+          }
         }
       }
     },

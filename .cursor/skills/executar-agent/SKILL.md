@@ -73,11 +73,51 @@ Escolhe **exactamente uma**:
 
 | proxima_acao | Quando |
 |--------------|--------|
-| `PERGUNTAR_USUARIO` | Tipo interactive e falta info crítica (usa AskQuestion se disponível) |
-| `CHAMAR_FERRAMENTA` | Próxima skill da toolbox ainda não satisfeita |
+| `PERGUNTAR_USUARIO` | Tipo interactive e falta info crítica; **ou** ação potencialmente perigosa (ver Confirmação de segurança) |
+| `CHAMAR_FERRAMENTA` | Próxima skill da toolbox ainda não satisfeita **e** confirmação obtida se necessária |
 | `FINALIZAR` | Objetivo atingido E regras obrigatórias cumpridas |
 
 **Nunca** saltar `ferramentas_obrigatorias` de `rules.md` antes de FINALIZAR.
+
+---
+
+## Confirmação de segurança (obrigatório)
+
+Antes de **qualquer** ação abaixo, escolhe `PERGUNTAR_USUARIO`, apresenta um resumo claro do que vai correr e o **nível de risco**, e **aguarda confirmação explícita** (`sim`, `yes`, `confirmo`, `podes executar`). Sem isso, **não avances**.
+
+### Exige confirmação
+
+| Categoria | Exemplos no Cursor |
+|-----------|-------------------|
+| **Shell** | `Shell`, scripts, `pip install`, `npm run`, builds, deletes via terminal |
+| **Escrita / remoção** | `Write`, `StrReplace`, `Delete`, editar ficheiros |
+| **Rede** | `curl`, `wget`, `fetch`, skills **rest**, APIs externas |
+| **MCP externo** | `CallMcpTool` para serviços fora do workspace (Stripe, Supabase, etc.) |
+| **Git destrutivo / remoto** | `git push`, `git reset --hard`, force push |
+| **Publicação** | `npm publish`, deploy, webhooks que alteram sistemas externos |
+| **Secrets / env** | Ler ou usar `.env`, chaves API, tokens, credenciais |
+
+Também aplica a skills listadas em `rules.md > acoes_sensiveis` / `blueprint.rules.acoes_com_confirmacao`.
+
+### Isento de confirmação (seguro)
+
+- `Read`, `Grep`, `Glob`, listagens read-only
+- Simulação de skills **mock** (sem side-effects reais)
+- Validação local (`validate.py`) se **não** alterar ficheiros
+
+### Formato da confirmação
+
+```
+⚠️ Confirmação necessária
+
+Ação: <o que vai executar, em linguagem clara>
+Risco: baixo | médio | alto
+Impacto: <ficheiros, rede, dados afetados>
+
+Confirmas? (sim/não)
+```
+
+**Proibido:** assumir consentimento, interpretar silêncio como sim, ou executar "só para testar".
 
 ### AGIR — executar skills
 
@@ -141,6 +181,8 @@ Parseia tudo depois de `:` como **entrada**.
 - ❌ Ignorar `rules.md` ou skills obrigatórias
 - ❌ Inventar ferramentas fora da toolbox
 - ❌ Mais de 7 skills numa execução inventada (usa só as do contrato)
+- ❌ Executar Shell, escrita, rede, MCP externo ou git push **sem confirmação explícita**
+- ❌ Aceder a secrets ou publicar fora do workspace sem autorização
 
 ## Opcional (debug)
 
@@ -151,4 +193,5 @@ Parseia tudo depois de `:` como **entrada**.
 ## Referências
 
 - `agent-forge/docs/RUNTIME-CURSOR.md`
+- `agent-forge/docs/SEGURANCA.md`
 - Skill irmã: `criador-de-agents`

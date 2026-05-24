@@ -151,7 +151,11 @@
       }
     ],
     "acoes_com_confirmacao": [
-      "salvar_template"
+      "salvar_template",
+      "executar_shell",
+      "escrever_ficheiro",
+      "chamada_rede",
+      "git_push"
     ],
     "obrigatorias": [
       "avaliar_prompt"
@@ -159,8 +163,17 @@
     "proibidas": [
       "inventar_constraints_nao_fornecidas",
       "finalizar_sem_avaliacao_aprovada",
-      "prompt_maior_que_contexto_util"
-    ]
+      "prompt_maior_que_contexto_util",
+      "publicar_externamente",
+      "aceder_fora_workspace",
+      "executar_shell_sem_confirmacao"
+    ],
+    "politica_confirmacao": {
+      "obrigatoria": true,
+      "decisao_planner": "PERGUNTAR_USUARIO",
+      "aceitar_apenas": ["sim", "yes", "confirmo", "podes executar"],
+      "nunca_assumir_consentimento": true
+    }
   },
   "memory": {
     "curta": true,

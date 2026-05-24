@@ -43,6 +43,20 @@ CRITERIO_PARADA = {
     "tempo_max": "limite_tempo_excedido",
 }
 
+PROIBIDAS_BASELINE = [
+    "publicar_externamente",
+    "aceder_fora_workspace",
+    "executar_shell_sem_confirmacao",
+]
+
+POLITICA_CONFIRMACAO_DEFAULT: dict[str, Any] = {
+    "obrigatoria": True,
+    "decisao_planner": "PERGUNTAR_USUARIO",
+    "aceitar_apenas": ["sim", "yes", "confirmo", "podes executar"],
+    "nunca_assumir_consentimento": True,
+    "acoes_isentas": ["read", "grep", "list_dir", "mock_skill"],
+}
+
 
 def _regras_planner_dominio(bp: dict[str, Any]) -> list[str]:
     """Regras do planner derivadas do blueprint (sem hardcode de outro agent)."""
@@ -67,6 +81,15 @@ def _regras_planner_dominio(bp: dict[str, Any]) -> list[str]:
         regras.append("resumir ou responder apenas com base em texto obtido via ferramentas")
 
     regras.append("nao inventar dados que deveriam vir de ferramentas")
+
+    acoes_sensiveis = bp.get("rules", {}).get("acoes_com_confirmacao") or []
+    if acoes_sensiveis:
+        regras.append(
+            "usar PERGUNTAR_USUARIO antes de acoes_sensiveis: " + ", ".join(acoes_sensiveis)
+        )
+    regras.append(
+        "nunca executar shell, escrita, rede ou mcp externo sem confirmacao explicita do utilizador"
+    )
     return regras
 
 
@@ -236,10 +259,15 @@ def export_from_blueprint(bp: dict[str, Any], out: Path) -> None:
             "chamadas_ferramenta": chamadas,
         },
         "acoes_sensiveis": rules_bp.get("acoes_com_confirmacao", []),
-        "politicas": rules_bp.get("proibidas", []) + [
-            "nao inventar fontes ou paginas",
-            "citar material consultado em toda resposta final",
-        ],
+        "politica_confirmacao": rules_bp.get("politica_confirmacao") or POLITICA_CONFIRMACAO_DEFAULT,
+        "politicas": list(
+            dict.fromkeys(
+                (rules_bp.get("proibidas") or []) + PROIBIDAS_BASELINE + [
+                    "nao inventar fontes ou paginas",
+                    "citar material consultado em toda resposta final",
+                ]
+            )
+        ),
     }
     (out / "rules.md").write_text(
         _md_with_yaml("rules.md", "Limites e politicas.", rules_yaml),

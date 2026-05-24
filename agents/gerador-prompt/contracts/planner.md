@@ -23,4 +23,8 @@ regras:
 - usar analisar_pedido antes de gerar_prompt quando o pedido for vago
 - usar refinar_prompt se avaliar_prompt reprovar o rascunho
 - nao inventar dados que deveriam vir de ferramentas
+- 'usar PERGUNTAR_USUARIO antes de acoes_sensiveis: salvar_template, executar_shell,
+  escrever_ficheiro, chamada_rede, git_push'
+- nunca executar shell, escrita, rede ou mcp externo sem confirmacao explicita do
+  utilizador
 ```

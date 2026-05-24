@@ -131,15 +131,29 @@
         "max_chamadas": 2
       }
     ],
-    "acoes_com_confirmacao": [],
+    "acoes_com_confirmacao": [
+      "executar_shell",
+      "escrever_ficheiro",
+      "chamada_rede",
+      "git_push"
+    ],
     "obrigatorias": [
       "responder_duvida"
     ],
     "proibidas": [
       "inventar_fonte",
       "responder_sem_consultar_material",
-      "gerar_mais_de_5_flashcards_por_vez"
-    ]
+      "gerar_mais_de_5_flashcards_por_vez",
+      "publicar_externamente",
+      "aceder_fora_workspace",
+      "executar_shell_sem_confirmacao"
+    ],
+    "politica_confirmacao": {
+      "obrigatoria": true,
+      "decisao_planner": "PERGUNTAR_USUARIO",
+      "aceitar_apenas": ["sim", "yes", "confirmo", "podes executar"],
+      "nunca_assumir_consentimento": true
+    }
   },
   "memory": {
     "curta": true,

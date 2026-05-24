@@ -134,6 +134,69 @@
     { "id": "tokens_max", "nome": "Limite de tokens atingido" },
     { "id": "interrupcao_externa", "nome": "Interrupção por decisão externa" }
   ],
+  "acoes_com_confirmacao": [
+    {
+      "id": "executar_shell",
+      "nome": "Executar Shell",
+      "descricao": "Comandos de terminal com side-effects (install, build, delete)",
+      "risco": "alto",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "escrever_ficheiro",
+      "nome": "Escrever ficheiro",
+      "descricao": "Criar ou alterar ficheiros no disco",
+      "risco": "medio",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "apagar_ficheiro",
+      "nome": "Apagar ficheiro",
+      "descricao": "Remover ficheiros ou pastas",
+      "risco": "alto",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "chamada_rede",
+      "nome": "Chamada de rede",
+      "descricao": "HTTP, REST, fetch para APIs externas",
+      "risco": "medio",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "chamada_mcp_externa",
+      "nome": "MCP externo",
+      "descricao": "Ferramentas MCP fora do workspace (Stripe, Supabase, etc.)",
+      "risco": "medio",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "git_push",
+      "nome": "Git push",
+      "descricao": "Enviar commits para remoto",
+      "risco": "alto",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "publicar_pacote",
+      "nome": "Publicar pacote",
+      "descricao": "npm publish, deploy, webhooks destrutivos",
+      "risco": "alto",
+      "requer_confirmacao": true
+    },
+    {
+      "id": "aceder_secrets_env",
+      "nome": "Aceder secrets",
+      "descricao": "Ler ou usar .env, tokens, chaves API",
+      "risco": "alto",
+      "requer_confirmacao": true
+    }
+  ],
+  "proibidas_baseline": [
+    "publicar_externamente",
+    "aceder_fora_workspace",
+    "executar_shell_sem_confirmacao"
+  ],
   "eventos_hooks": [
     { "id": "antes_iteracao", "nome": "Antes de iteração" },
     { "id": "depois_iteracao", "nome": "Depois de iteração" },

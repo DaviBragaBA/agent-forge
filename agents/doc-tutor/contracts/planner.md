@@ -22,4 +22,8 @@ regras:
 - consultar listar_materiais antes de ler_capitulo quando o material nao for conhecido
 - resumir ou responder apenas com base em texto obtido via ferramentas
 - nao inventar dados que deveriam vir de ferramentas
+- 'usar PERGUNTAR_USUARIO antes de acoes_sensiveis: executar_shell, escrever_ficheiro,
+  chamada_rede, git_push'
+- nunca executar shell, escrita, rede ou mcp externo sem confirmacao explicita do
+  utilizador
 ```

@@ -67,6 +67,7 @@ Apresentar os 4 tipos com descrição curta e perguntar qual encaixa:
   - Nome (snake_case)
   - O que faz (1 linha)
   - Tipo de implementação: mock | rest | database | mcp
+- **Segurança (sugerir automaticamente):** skills com `rest`, `database` ou `mcp` devem entrar em `acoes_com_confirmacao`; skills que escrevem ficheiros ou publicam dados também.
 
 **P5. Loop**
 - Max iterações (default: 8)
@@ -74,9 +75,12 @@ Apresentar os 4 tipos com descrição curta e perguntar qual encaixa:
 - Critérios de parada (já incluir `objetivo_alcancado` e `limite_etapas` por default)
 
 **P6. Regras**
-- Alguma ação que exige CONFIRMAÇÃO humana?
+- Alguma ação que exige CONFIRMAÇÃO humana? (default: incluir skills `rest`/`database`/`mcp` + ações de escrita/publicação)
 - Alguma ação OBRIGATÓRIA antes de finalizar?
 - Algum limite especial (ex: "max 3 chamadas a `buscar_logs`")?
+- **Defaults de segurança** (incluir no blueprint se o utilizador não disser o contrário):
+  - `acoes_com_confirmacao`: skills sensíveis + `executar_shell`, `escrever_ficheiro`, `chamada_rede`, `git_push`
+  - `proibidas`: `publicar_externamente`, `aceder_fora_workspace`, `executar_shell_sem_confirmacao`
 
 **P7. Memória** (perguntar simples — sim/não para cada)
 - Memória curta: SIM (sempre)
@@ -123,9 +127,18 @@ Construa um JSON conforme `agent-forge/blueprint.schema.json`. Estrutura mínima
   "toolbox": ["skill_um"],
   "rules": {
     "limites_ferramenta": [],
-    "acoes_com_confirmacao": [],
+    "acoes_com_confirmacao": [
+      "executar_shell",
+      "escrever_ficheiro",
+      "chamada_rede",
+      "git_push"
+    ],
     "obrigatorias": [],
-    "proibidas": []
+    "proibidas": [
+      "publicar_externamente",
+      "aceder_fora_workspace",
+      "executar_shell_sem_confirmacao"
+    ]
   },
   "memory": {
     "curta": true,
@@ -217,7 +230,8 @@ Apresentar também:
 4. **Loop** sempre com pelo menos `objetivo_alcancado` ou `limite_etapas`.
 5. **Memória longa** sempre com aviso: "armazene APENAS fatos confirmados por ferramenta".
 6. **Idioma:** tudo em português (PT-BR/PT-PT é indiferente, manter consistente).
-7. **Se Python não estiver disponível:** gerar os ficheiros MD manualmente usando os templates em `agent-forge/templates/` + substituição de placeholders.
+7. **Segurança:** todo blueprint inclui `acoes_com_confirmacao` para ferramentas de risco e `proibidas` baseline; o runtime Cursor aplica confirmação extra (skill `executar-agent`).
+8. **Se Python não estiver disponível:** gerar os ficheiros MD manualmente usando os templates em `agent-forge/templates/` + substituição de placeholders.
 
 ## Anti-padrões
 
@@ -233,3 +247,4 @@ Apresentar também:
 - `agent-forge/blueprint.schema.json` — schema completo
 - `agent-forge/taxonomies.json` — taxonomias (tipos, arquiteturas, adapters, memórias)
 - `agent-forge/templates/*.template` — templates dos 9 contratos
+- `agent-forge/docs/SEGURANCA.md` — confirmação humana e ações de risco

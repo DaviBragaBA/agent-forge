@@ -16,11 +16,27 @@ limites:
     ler_capitulo: 5
     gerar_flashcards: 3
     criar_exercicio: 2
-acoes_sensiveis: []
+acoes_sensiveis:
+- executar_shell
+- escrever_ficheiro
+- chamada_rede
+- git_push
+politica_confirmacao:
+  obrigatoria: true
+  decisao_planner: PERGUNTAR_USUARIO
+  aceitar_apenas:
+  - sim
+  - 'yes'
+  - confirmo
+  - podes executar
+  nunca_assumir_consentimento: true
 politicas:
 - inventar_fonte
 - responder_sem_consultar_material
 - gerar_mais_de_5_flashcards_por_vez
+- publicar_externamente
+- aceder_fora_workspace
+- executar_shell_sem_confirmacao
 - nao inventar fontes ou paginas
 - citar material consultado em toda resposta final
 ```

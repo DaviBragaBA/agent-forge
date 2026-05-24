@@ -11,9 +11,38 @@
 
 ## Ações que Exigem Confirmação Humana
 
+Antes de executar, o planner deve escolher `PERGUNTAR_USUARIO`, resumir a ação e o risco, e **aguardar sim explícito**.
+
 {{#each rules.acoes_com_confirmacao}}
-- ⚠️ `{{this}}` — requer confirmação explícita do usuário antes de executar
+- ⚠️ `{{this}}` — requer confirmação explícita do utilizador antes de executar
 {{/each}}
+
+### Política de confirmação (runtime)
+
+```yaml
+politica_confirmacao:
+  obrigatoria: true
+  decisao_planner: PERGUNTAR_USUARIO
+  aceitar_apenas:
+    - sim
+    - yes
+    - confirmo
+    - podes executar
+  nunca_assumir_consentimento: true
+  acoes_isentas:
+    - read
+    - grep
+    - list_dir
+    - mock_skill
+  categorias_risco:
+    shell: executar_shell
+    escrita: escrever_ficheiro | apagar_ficheiro
+    rede: chamada_rede | rest | fetch
+    mcp: chamada_mcp_externa
+    git: git_push | git_reset_destrutivo
+    publicacao: npm_publish | deploy
+    secrets: aceder_secrets_env
+```
 
 ## Ações Obrigatórias
 
@@ -40,6 +69,8 @@ Independente do agent, estas regras SEMPRE se aplicam:
 3. **Nunca chamar APIs sem timeout**
 4. **Nunca finalizar sem registrar resultado**
 5. **Nunca ignorar erros silenciosamente**
+6. **Nunca executar Shell, escrita, rede ou MCP externo sem confirmação humana**
+7. **Nunca aceder a ficheiros ou serviços fora do workspace** sem autorização
 
 ## O que acontece se uma regra for violada?
 
@@ -48,4 +79,5 @@ Independente do agent, estas regras SEMPRE se aplicam:
 | Limite excedido | Aviso + recusa da chamada |
 | Ação obrigatória ignorada | Recusa de finalização |
 | Ação proibida tentada | Bloqueio imediato + trace de violação |
-| Confirmação não dada | Pausa aguardando humano |
+| Confirmação não dada | Pausa aguardando humano (`PERGUNTAR_USUARIO`) |
+| Confirmação negada | Encerrar etapa ou propor alternativa segura |
