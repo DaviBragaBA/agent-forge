@@ -1,0 +1,68 @@
+# Memory: {{nome_amigavel}}
+
+> Gestão de memória do agent. Define o que lembrar, por quanto tempo e como recuperar.
+
+## Tipos de Memória Habilitados
+
+| Tipo | Habilitado | Propósito |
+|------|------------|-----------|
+| Curta | {{memory.curta}} | Estado da execução atual (vive durante o ciclo) |
+| Longa | {{memory.longa}} | Fatos persistentes sobre o domínio |
+| Episódica | {{memory.episodica}} | Histórico de execuções e lições |
+| Contextual | {{memory.contextual}} | Recuperação por similaridade semântica |
+
+## Configuração
+
+```yaml
+limite_registros: {{memory.limite_registros}}
+embedding_model: {{memory.embedding_model}}
+```
+
+## Políticas de Persistência
+
+### Memória Curta
+- Vive APENAS durante a execução atual
+- Inclui: resultados de ações, decisões tomadas, evidências coletadas
+- NÃO inclui: prompts completos, dados redundantes
+
+### Memória Longa
+- ⚠️ **Armazenar APENAS fatos confirmados por ferramenta**
+- Se uma informação não foi validada, NÃO persistir
+- Evitar duplicação (verificar antes de inserir)
+
+### Memória Episódica
+- Armazena resumos de execuções, não traces completos
+- Cada episódio contém: situação, ação, resultado, aprendizado
+- Lições devem ser: generalizáveis, acionáveis, baseadas em evidência
+
+### Memória Contextual
+- Indexa fragmentos com embeddings
+- Limite de similaridade (cosseno): **0.7** (ajustável)
+- Reindex periódico para evitar drift
+
+## Regras de Segurança
+
+🚫 **NUNCA armazenar:**
+- Senhas, tokens, secrets
+- Dados pessoais identificáveis sem consentimento
+- Informações que possam ficar desatualizadas sem revalidação
+
+## Política de Expiração
+
+```yaml
+memoria_longa:
+  ttl_dias: 90
+  revalidar_a_cada: 30
+memoria_episodica:
+  manter_ultimas: 100
+  arquivar_apos: 365
+```
+
+## Recuperação no Loop
+
+Antes do `planner` decidir, o runtime recupera:
+1. Episódios similares (top-3 por similaridade)
+2. Fatos relevantes da memória longa
+3. Lições aprendidas em casos parecidos
+
+Esse contexto enriquecido é injetado no prompt do planner.

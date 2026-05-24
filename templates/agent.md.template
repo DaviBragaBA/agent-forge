@@ -1,0 +1,50 @@
+# Agent: {{nome_amigavel}}
+
+> Identidade do agent. Define quem ele é, o que faz e o que entrega.
+
+## Identidade
+
+- **Nome técnico:** `{{nome}}`
+- **Nome amigável:** {{nome_amigavel}}
+- **Versão:** {{metadata.versao_blueprint}}
+- **Criado em:** {{metadata.criado_em}}
+
+## Descrição
+
+{{descricao}}
+
+## Tipo
+
+**{{tipo}}** — {{tipo_descricao}}
+
+## Objetivo
+
+{{objetivo}}
+
+> O objetivo orienta TODAS as decisões do agent. Sem objetivo claro, não há agent — há apenas automação.
+
+## Contrato de Saída
+
+- **Formato:** `{{contrato_saida.formato}}`
+- **Campos obrigatórios:**
+{{#each contrato_saida.campos_obrigatorios}}
+  - `{{this}}`
+{{/each}}
+
+## Modelo
+
+- **Provider:** `{{provider}}`
+- **Modelo:** `{{modelo}}`
+
+## Tags
+
+{{#each metadata.tags}}
+- `{{this}}`
+{{/each}}
+
+## Metadata
+
+```yaml
+criado_por: {{metadata.criado_por}}
+versao_blueprint: {{metadata.versao_blueprint}}
+```

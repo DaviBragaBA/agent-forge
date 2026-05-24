@@ -1,0 +1,55 @@
+# Hooks: {{nome_amigavel}}
+
+> Pontos de extensão para observabilidade. Permite interceptar eventos em runtime.
+
+## Hooks Configurados
+
+{{#each hooks}}
+- **{{this.evento}}** → ação: `{{this.acao}}`
+{{/each}}
+
+## Eventos Disponíveis
+
+| Evento | Quando dispara | Dados disponíveis |
+|--------|---------------|-------------------|
+| `antes_iteracao` | Antes de cada ciclo do loop | iteração, estado |
+| `depois_iteracao` | Após cada ciclo do loop | iteração, decisão, resultado |
+| `antes_tool` | Antes de chamar ferramenta | ferramenta, argumentos |
+| `depois_tool` | Após resposta da ferramenta | ferramenta, resultado, latência |
+| `ao_finalizar` | Quando o agent termina | trace completo, output |
+| `ao_falhar` | Quando ocorre erro fatal | erro, estado, último plano |
+
+## Ações Disponíveis
+
+- **log** — registra no stdout estruturado
+- **alerta** — emite alerta no dashboard
+- **webhook** — POST para URL configurada
+
+## Trace Estruturado
+
+Independente dos hooks, o runtime SEMPRE gera `trace.json` com:
+
+```json
+{
+  "execution_id": "uuid",
+  "agent": "{{nome}}",
+  "started_at": "iso8601",
+  "finished_at": "iso8601",
+  "status": "completo | falho | timeout",
+  "total_tokens": 0,
+  "total_iteracoes": 0,
+  "etapas": [
+    {
+      "iteracao": 1,
+      "percepcao": "...",
+      "plano": { "raciocinio": "...", "ferramenta": "...", "argumentos": {} },
+      "resultado": { "...": "..." },
+      "avaliacao": "completo | parcial | falho",
+      "duracao_ms": 0,
+      "tokens_consumidos": 0
+    }
+  ]
+}
+```
+
+> Logs tradicionais NÃO são suficientes para agents. Use sempre o trace estruturado.

@@ -1,0 +1,51 @@
+# Rules: {{nome_amigavel}}
+
+> Limites, restrições e regras de segurança.
+> Este é o principal mecanismo de PROTEÇÃO do agent.
+
+## Limites por Ferramenta
+
+{{#each rules.limites_ferramenta}}
+- `{{this.ferramenta}}` — máximo **{{this.max_chamadas}}** chamadas por execução
+{{/each}}
+
+## Ações que Exigem Confirmação Humana
+
+{{#each rules.acoes_com_confirmacao}}
+- ⚠️ `{{this}}` — requer confirmação explícita do usuário antes de executar
+{{/each}}
+
+## Ações Obrigatórias
+
+O agent NÃO pode finalizar sem ter executado:
+
+{{#each rules.obrigatorias}}
+- 📌 `{{this}}`
+{{/each}}
+
+## Ações Proibidas
+
+NUNCA executar:
+
+{{#each rules.proibidas}}
+- 🚫 `{{this}}`
+{{/each}}
+
+## Regras de Segurança Universais
+
+Independente do agent, estas regras SEMPRE se aplicam:
+
+1. **Nunca armazenar credenciais** em memória, trace ou contratos
+2. **Nunca executar SQL não parametrizado**
+3. **Nunca chamar APIs sem timeout**
+4. **Nunca finalizar sem registrar resultado**
+5. **Nunca ignorar erros silenciosamente**
+
+## O que acontece se uma regra for violada?
+
+| Violação | Ação |
+|----------|------|
+| Limite excedido | Aviso + recusa da chamada |
+| Ação obrigatória ignorada | Recusa de finalização |
+| Ação proibida tentada | Bloqueio imediato + trace de violação |
+| Confirmação não dada | Pausa aguardando humano |

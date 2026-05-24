@@ -1,0 +1,203 @@
+{
+  "nome": "gerador-prompt",
+  "nome_amigavel": "Gerador de Prompts",
+  "descricao": "Transforma intenções vagas em prompts estruturados, testáveis e reutilizáveis para LLM ou Cursor. Pergunta contexto quando falta informação, gera, refina e valida antes de entregar.",
+  "tipo": "interactive",
+  "objetivo": "Produzir um prompt final em markdown com role, contexto, tarefa, formato, constraints e variáveis, validado por checklist de qualidade, pronto para copiar e usar.",
+  "arquitetura_cognitiva": "react",
+  "provider": "auto",
+  "contrato_saida": {
+    "formato": "markdown",
+    "campos_obrigatorios": [
+      "titulo",
+      "prompt_system",
+      "prompt_user",
+      "variaveis",
+      "checklist_qualidade",
+      "dicas_uso"
+    ]
+  },
+  "loop": {
+    "max_iteracoes": 8,
+    "tempo_max_segundos": 120,
+    "tokens_max": 50000,
+    "criterios_parada": [
+      "objetivo_alcancado",
+      "limite_etapas",
+      "falta_progresso",
+      "tempo_max"
+    ]
+  },
+  "skills": [
+    {
+      "nome": "analisar_pedido",
+      "descricao": "Extrai objetivo, audiência, tom, formato de saída e constraints explícitas ou implícitas do pedido do utilizador.",
+      "entrada": {
+        "pedido_bruto": "string",
+        "contexto_opcional": "string"
+      },
+      "saida": {
+        "objetivo": "string",
+        "audiencia": "string",
+        "tom": "string",
+        "formato_saida": "string",
+        "constraints": "list",
+        "lacunas": "list"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "pesquisar_contexto",
+      "descricao": "Lê ficheiro, snippet ou descrição de repo fornecida pelo utilizador para enriquecer o prompt (mock: devolve texto simulado).",
+      "entrada": {
+        "caminho_ou_texto": "string",
+        "tipo": "string (ficheiro|repo|notas)"
+      },
+      "saida": {
+        "contexto_extraido": "string",
+        "trechos_relevantes": "list"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "gerar_prompt",
+      "descricao": "Gera rascunho do prompt com secções: role, contexto, tarefa, formato, constraints, exemplos opcionais.",
+      "entrada": {
+        "analise": "object",
+        "contexto_adicional": "string"
+      },
+      "saida": {
+        "prompt_system": "string",
+        "prompt_user": "string",
+        "variaveis": "list"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "refinar_prompt",
+      "descricao": "Ajusta o rascunho com base em feedback do utilizador ou lacunas detectadas na avaliação.",
+      "entrada": {
+        "rascunho": "object",
+        "feedback": "string"
+      },
+      "saida": {
+        "prompt_system": "string",
+        "prompt_user": "string",
+        "variaveis": "list",
+        "alteracoes": "list"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "avaliar_prompt",
+      "descricao": "Checklist: claro, completo, sem ambiguidade, constraints realistas, variáveis nomeadas, testável numa única chamada LLM.",
+      "entrada": {
+        "prompt_system": "string",
+        "prompt_user": "string"
+      },
+      "saida": {
+        "aprovado": "bool",
+        "nota": "float",
+        "problemas": "list",
+        "sugestoes": "list"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "salvar_template",
+      "descricao": "Serializa o prompt aprovado como template reutilizável com nome e tags (mock: devolve JSON do template).",
+      "entrada": {
+        "nome_template": "string",
+        "prompt_system": "string",
+        "prompt_user": "string",
+        "tags": "list"
+      },
+      "saida": {
+        "template_id": "string",
+        "caminho_sugerido": "string"
+      },
+      "tipo_implementacao": "mock"
+    }
+  ],
+  "toolbox": [
+    "analisar_pedido",
+    "pesquisar_contexto",
+    "gerar_prompt",
+    "refinar_prompt",
+    "avaliar_prompt",
+    "salvar_template"
+  ],
+  "rules": {
+    "limites_ferramenta": [
+      {
+        "ferramenta": "gerar_prompt",
+        "max_chamadas": 2
+      },
+      {
+        "ferramenta": "refinar_prompt",
+        "max_chamadas": 2
+      },
+      {
+        "ferramenta": "avaliar_prompt",
+        "max_chamadas": 3
+      },
+      {
+        "ferramenta": "salvar_template",
+        "max_chamadas": 1
+      },
+      {
+        "ferramenta": "pesquisar_contexto",
+        "max_chamadas": 2
+      }
+    ],
+    "acoes_com_confirmacao": [
+      "salvar_template"
+    ],
+    "obrigatorias": [
+      "avaliar_prompt"
+    ],
+    "proibidas": [
+      "inventar_constraints_nao_fornecidas",
+      "finalizar_sem_avaliacao_aprovada",
+      "prompt_maior_que_contexto_util"
+    ]
+  },
+  "memory": {
+    "curta": true,
+    "longa": true,
+    "episodica": false,
+    "contextual": false,
+    "limite_registros": 50
+  },
+  "hooks": [
+    {
+      "evento": "antes_iteracao",
+      "acao": "log"
+    },
+    {
+      "evento": "depois_tool",
+      "acao": "log"
+    },
+    {
+      "evento": "ao_finalizar",
+      "acao": "log"
+    },
+    {
+      "evento": "ao_falhar",
+      "acao": "alerta"
+    }
+  ],
+  "metadata": {
+    "criado_em": "2026-05-23T00:00:00",
+    "criado_por": "agent-forge (gerador-prompt)",
+    "versao_blueprint": "1.0.0",
+    "tags": [
+      "prompts",
+      "llm",
+      "cursor",
+      "engenharia-prompt"
+    ]
+  },
+  "tipo_descricao": "Quando a entrada é ambígua, faz perguntas antes de agir.",
+  "arquitetura_descricao": "Pensa, age e observa em ciclo. Descobre o caminho enquanto avança."
+}

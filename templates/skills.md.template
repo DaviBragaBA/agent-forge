@@ -1,0 +1,40 @@
+# Skills: {{nome_amigavel}}
+
+> O que o agent SABE fazer. Cada skill define uma interface (não a implementação).
+> A implementação é resolvida pelo adapter correspondente.
+
+## Capacidades
+
+{{#each skills}}
+### `{{this.nome}}`
+
+**Descrição:** {{this.descricao}}
+
+**Tipo de implementação:** `{{this.tipo_implementacao}}`
+
+**Entrada:**
+```json
+{{this.entrada}}
+```
+
+**Saída:**
+```json
+{{this.saida}}
+```
+
+{{#if this.configuracao}}
+**Configuração:**
+```yaml
+{{this.configuracao}}
+```
+{{/if}}
+
+---
+{{/each}}
+
+## Diferença entre Skill e Toolbox
+
+- **Skill** = o que o agent SABE fazer (capacidade declarada)
+- **Toolbox** = o que o agent PODE fazer agora (subconjunto autorizado)
+
+Se uma skill está aqui mas NÃO está em `toolbox.md`, o agent não pode usá-la.

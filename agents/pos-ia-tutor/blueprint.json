@@ -1,0 +1,184 @@
+{
+  "nome": "pos-ia-tutor",
+  "nome_amigavel": "Tutor da Pós em IA",
+  "descricao": "Agent tutor que ajuda a estudar a matéria da pós-graduação em Engenharia de Software com IA. Lê material da disciplina, gera resumos focados, cria flashcards de revisão espaçada e responde dúvidas com citações.",
+  "tipo": "interactive",
+  "objetivo": "Acelerar a aprendizagem do aluno na pós em IA gerando resumos didáticos, flashcards e respostas baseadas exclusivamente no material oficial da disciplina, sempre citando capítulo e página.",
+  "arquitetura_cognitiva": "react",
+  "provider": "auto",
+  "modelo": "claude-3-5-sonnet",
+  "contrato_saida": {
+    "formato": "markdown",
+    "campos_obrigatorios": [
+      "titulo",
+      "conteudo",
+      "fontes",
+      "proxima_acao_sugerida"
+    ]
+  },
+  "loop": {
+    "max_iteracoes": 8,
+    "tempo_max_segundos": 180,
+    "tokens_max": 80000,
+    "criterios_parada": [
+      "objetivo_alcancado",
+      "limite_etapas",
+      "falta_progresso",
+      "tempo_max"
+    ]
+  },
+  "skills": [
+    {
+      "nome": "listar_materiais",
+      "descricao": "Lista todos os PDFs e ficheiros de matéria disponíveis em c:\\Users\\davib\\OneDrive\\Área de Trabalho\\Pós em Inteligencia artificial",
+      "entrada": {
+        "filtro": "string opcional (ex: 'agente')"
+      },
+      "saida": {
+        "materiais": "Array<{ nome: string, caminho: string, tamanho_kb: number }>"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "ler_capitulo",
+      "descricao": "Lê um capítulo específico de um material, retorna o conteúdo textual com numeração de páginas",
+      "entrada": {
+        "caminho_pdf": "string",
+        "intervalo_paginas": "string (ex: '1-10', opcional)"
+      },
+      "saida": {
+        "texto": "string",
+        "total_paginas": "number",
+        "metadados": "object"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "resumir_capitulo",
+      "descricao": "Gera resumo didático em markdown de um capítulo lido. Estrutura: conceitos-chave, fluxos, exemplos, anti-padrões.",
+      "entrada": {
+        "texto_capitulo": "string",
+        "estilo": "string (didatico|tecnico|esquematico)"
+      },
+      "saida": {
+        "resumo_md": "string",
+        "conceitos_chave": "string[]",
+        "duvidas_sugeridas": "string[]"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "gerar_flashcards",
+      "descricao": "Cria flashcards (pergunta + resposta + fonte) para revisão espaçada a partir de um resumo ou capítulo. Máximo 5 por chamada.",
+      "entrada": {
+        "fonte_texto": "string",
+        "dificuldade": "string (facil|medio|dificil)"
+      },
+      "saida": {
+        "flashcards": "Array<{ pergunta: string, resposta: string, fonte: string, dificuldade: string }>"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "responder_duvida",
+      "descricao": "Responde uma dúvida do aluno consultando o material disponível. SEMPRE cita capítulo e página. Se não encontrar resposta no material, declara explicitamente.",
+      "entrada": {
+        "pergunta": "string",
+        "materiais_consultados": "string[]"
+      },
+      "saida": {
+        "resposta": "string",
+        "fontes": "Array<{ material: string, capitulo: string, pagina: number }>",
+        "confianca": "number (0-1)"
+      },
+      "tipo_implementacao": "mock"
+    },
+    {
+      "nome": "criar_exercicio",
+      "descricao": "Gera um exercício prático baseado num tópico da matéria. Inclui enunciado, dicas e gabarito separado.",
+      "entrada": {
+        "topico": "string",
+        "nivel": "string (basico|intermediario|avancado)"
+      },
+      "saida": {
+        "enunciado": "string",
+        "dicas": "string[]",
+        "gabarito": "string"
+      },
+      "tipo_implementacao": "mock"
+    }
+  ],
+  "toolbox": [
+    "listar_materiais",
+    "ler_capitulo",
+    "resumir_capitulo",
+    "gerar_flashcards",
+    "responder_duvida",
+    "criar_exercicio"
+  ],
+  "rules": {
+    "limites_ferramenta": [
+      {
+        "ferramenta": "ler_capitulo",
+        "max_chamadas": 5
+      },
+      {
+        "ferramenta": "gerar_flashcards",
+        "max_chamadas": 3
+      },
+      {
+        "ferramenta": "criar_exercicio",
+        "max_chamadas": 2
+      }
+    ],
+    "acoes_com_confirmacao": [],
+    "obrigatorias": [
+      "responder_duvida"
+    ],
+    "proibidas": [
+      "inventar_fonte",
+      "responder_sem_consultar_material",
+      "gerar_mais_de_5_flashcards_por_vez"
+    ]
+  },
+  "memory": {
+    "curta": true,
+    "longa": true,
+    "episodica": true,
+    "contextual": true,
+    "limite_registros": 200,
+    "embedding_model": "text-embedding-3-small"
+  },
+  "hooks": [
+    {
+      "evento": "antes_iteracao",
+      "acao": "log"
+    },
+    {
+      "evento": "depois_tool",
+      "acao": "log"
+    },
+    {
+      "evento": "ao_finalizar",
+      "acao": "log"
+    },
+    {
+      "evento": "ao_falhar",
+      "acao": "alerta"
+    }
+  ],
+  "metadata": {
+    "criado_em": "2026-05-23T15:43:00",
+    "criado_por": "agent-forge (primeiro agent)",
+    "versao_blueprint": "1.0.0",
+    "tags": [
+      "estudos",
+      "tutoria",
+      "pos-graduacao",
+      "ia",
+      "rag"
+    ]
+  },
+  "tipo_descricao": "Quando a entrada é ambígua, faz perguntas antes de agir.",
+  "arquitetura_descricao": "Pensa, age e observa em ciclo. Descobre o caminho enquanto avança."
+}

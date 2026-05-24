@@ -1,0 +1,161 @@
+{
+  "tipos_agent": [
+    {
+      "id": "task-based",
+      "nome": "Task-Based",
+      "descricao": "Recebe uma tarefa bem definida, executa e retorna. Fluxo direto sem decomposição.",
+      "ideal_para": ["Entrada clara", "Objetivo específico", "Sem ambiguidade"],
+      "exemplo": "MonitorAgent: recebe alerta, retorna diagnóstico",
+      "icone": "⚡"
+    },
+    {
+      "id": "interactive",
+      "nome": "Interativo",
+      "descricao": "Quando a entrada é ambígua, faz perguntas antes de agir.",
+      "ideal_para": ["Contexto incompleto", "Decisões críticas", "Evitar suposições"],
+      "exemplo": "Tutor: identifica lacunas e pergunta antes de explicar",
+      "icone": "💬"
+    },
+    {
+      "id": "goal-oriented",
+      "nome": "Orientado a Objetivo",
+      "descricao": "Recebe objetivo amplo, decompõe em sub-objetivos executáveis.",
+      "ideal_para": ["Problemas complexos", "Planejamento estruturado", "Múltiplas etapas"],
+      "exemplo": "Backlog Decomposer: requisito → épicos → histórias → critérios",
+      "icone": "🎯"
+    },
+    {
+      "id": "autonomous",
+      "nome": "Autônomo",
+      "descricao": "Reage a eventos. Não depende de solicitação humana direta.",
+      "ideal_para": ["Monitoramento contínuo", "Resposta a triggers", "Operação 24/7"],
+      "exemplo": "Watchdog: detecta anomalia e age dentro de limites",
+      "icone": "🤖",
+      "atencao": "Ações sensíveis EXIGEM confirmação humana"
+    }
+  ],
+  "arquiteturas_cognitivas": [
+    {
+      "id": "react",
+      "nome": "ReAct",
+      "descricao": "Pensa, age e observa em ciclo. Descobre o caminho enquanto avança.",
+      "vantagens": ["Adapta-se ao contexto", "Funciona bem com incerteza"],
+      "desvantagens": ["Alto consumo de tokens", "Menos previsível"],
+      "ideal_para": "Problemas exploratórios, caminho incerto",
+      "icone": "🔄"
+    },
+    {
+      "id": "plan-and-execute",
+      "nome": "Plan-and-Execute",
+      "descricao": "Cria plano completo no início e executa passo a passo.",
+      "vantagens": ["Previsível", "Eficiente", "Auditável"],
+      "desvantagens": ["Não se adapta a mudanças", "Falha silenciosamente se cenário muda"],
+      "ideal_para": "Processos estruturados, etapas conhecidas",
+      "icone": "📋"
+    },
+    {
+      "id": "reflection",
+      "nome": "Reflection",
+      "descricao": "Executa, avalia o próprio resultado e refina antes de finalizar.",
+      "vantagens": ["Alta qualidade", "Detecta erros antes de entregar"],
+      "desvantagens": ["Maior latência", "Maior custo"],
+      "ideal_para": "Cenários onde qualidade é crítica e erro é caro",
+      "icone": "🪞"
+    }
+  ],
+  "adapters": [
+    {
+      "id": "mock",
+      "nome": "Mock",
+      "descricao": "Dados simulados via LLM. Para prototipação e testes.",
+      "uso": "Aprendizado, desenvolvimento inicial",
+      "icone": "🎭"
+    },
+    {
+      "id": "rest",
+      "nome": "REST",
+      "descricao": "Chamadas HTTP a APIs reais.",
+      "uso": "Integração com serviços externos",
+      "icone": "🌐"
+    },
+    {
+      "id": "database",
+      "nome": "Database",
+      "descricao": "Queries em banco de dados (preferencialmente read-only e parametrizadas).",
+      "uso": "Consulta de dados estruturados",
+      "icone": "🗄️",
+      "regras_seguranca": ["Apenas leitura", "Queries parametrizadas", "Validação rigorosa"]
+    },
+    {
+      "id": "mcp",
+      "nome": "MCP (Model Context Protocol)",
+      "descricao": "Protocolo padronizado de comunicação com ferramentas.",
+      "uso": "Integração padronizada e reutilizável",
+      "icone": "🔌"
+    }
+  ],
+  "tipos_memoria": [
+    {
+      "id": "curta",
+      "nome": "Memória Curta",
+      "descricao": "Estado da execução atual. Morre ao final do ciclo.",
+      "analogia": "Mesa de trabalho",
+      "icone": "📝"
+    },
+    {
+      "id": "longa",
+      "nome": "Memória Longa",
+      "descricao": "Conhecimento persistente: fatos, configurações, preferências.",
+      "analogia": "Caderno de referência",
+      "icone": "📚",
+      "atencao": "Armazenar apenas fatos confirmados por ferramenta"
+    },
+    {
+      "id": "episodica",
+      "nome": "Memória Episódica",
+      "descricao": "Histórico de execuções anteriores e lições aprendidas.",
+      "analogia": "Diário profissional",
+      "icone": "📔"
+    },
+    {
+      "id": "contextual",
+      "nome": "Memória Contextual",
+      "descricao": "Recuperação por similaridade semântica via embeddings.",
+      "analogia": "Mecanismo de busca interno",
+      "icone": "🔍",
+      "tecnologia": "Embeddings + similaridade cosseno"
+    }
+  ],
+  "criterios_parada": [
+    { "id": "objetivo_alcancado", "nome": "Objetivo alcançado", "obrigatorio": true },
+    { "id": "limite_etapas", "nome": "Limite de iterações excedido", "obrigatorio": true },
+    { "id": "falta_progresso", "nome": "Falta de progresso detectada" },
+    { "id": "tempo_max", "nome": "Tempo máximo atingido" },
+    { "id": "tokens_max", "nome": "Limite de tokens atingido" },
+    { "id": "interrupcao_externa", "nome": "Interrupção por decisão externa" }
+  ],
+  "eventos_hooks": [
+    { "id": "antes_iteracao", "nome": "Antes de iteração" },
+    { "id": "depois_iteracao", "nome": "Depois de iteração" },
+    { "id": "antes_tool", "nome": "Antes de chamada de ferramenta" },
+    { "id": "depois_tool", "nome": "Depois de chamada de ferramenta" },
+    { "id": "ao_finalizar", "nome": "Ao finalizar execução" },
+    { "id": "ao_falhar", "nome": "Ao falhar" }
+  ],
+  "metricas": {
+    "tool_selection": [
+      { "id": "accuracy", "nome": "Tool Selection Accuracy", "limite_min": 0.8 },
+      { "id": "argument_accuracy", "nome": "Argument Accuracy", "limite_min": 0.8 },
+      { "id": "unnecessary_calls", "nome": "Unnecessary Calls Rate", "limite_max": 0.1 },
+      { "id": "wrong_tool", "nome": "Wrong Tool Rate", "limite_max": 0.15 }
+    ],
+    "memory": [
+      { "id": "retrieval_precision", "nome": "Retrieval Precision" },
+      { "id": "retrieval_recall", "nome": "Retrieval Recall" },
+      { "id": "memory_utilization", "nome": "Memory Utilization" },
+      { "id": "hallucination_from_memory", "nome": "Hallucination from Memory" },
+      { "id": "decision_improvement", "nome": "Decision Improvement", "destaque": true },
+      { "id": "lesson_quality", "nome": "Lesson Quality" }
+    ]
+  }
+}

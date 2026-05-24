@@ -1,0 +1,46 @@
+# Planner: {{nome_amigavel}}
+
+> Como o agent decide. Este NÃO é um prompt convencional — é um CONTRATO.
+> A LLM é obrigada a produzir saídas estruturadas dentro destes limites.
+
+## Arquitetura Cognitiva
+
+**{{arquitetura_cognitiva}}** — {{arquitetura_descricao}}
+
+## Formato Obrigatório de Saída
+
+A LLM DEVE retornar um JSON com os seguintes campos:
+
+```json
+{
+  "raciocinio": "string — o que já sei, o que falta, por que escolhi esta ação",
+  "proxima_acao": "string — descrição da ação",
+  "ferramenta": "string — nome de uma skill listada em toolbox.md",
+  "argumentos": { "...": "..." },
+  "criterio_sucesso": "string — como saber se a ação funcionou"
+}
+```
+
+> O campo `raciocinio` é OBRIGATÓRIO. Ele torna o pensamento explícito e habilita debug por reasoning trace.
+
+## Regras de Decisão
+
+1. **Coletar evidências antes de decidir** — não chutar baseado em padrões.
+2. **Justificar cada escolha de ferramenta** — usar `raciocinio` para explicar.
+3. **Verificar memória antes de agir** — não repetir trabalho já feito.
+4. **Respeitar a toolbox** — só usar ferramentas listadas em `toolbox.md`.
+5. **Reportar incerteza** — se confiança < 70%, indicar no raciocínio.
+
+## Quando finalizar
+
+A ação especial `__FINALIZAR__` é retornada quando:
+- O objetivo do agent foi alcançado
+- Todas as evidências necessárias foram coletadas
+- A saída pode ser formatada conforme `agent.md > Contrato de Saída`
+
+## Anti-padrões a evitar
+
+- ❌ Continuar coletando dados após já ter evidências suficientes
+- ❌ Chamar a mesma ferramenta com os mesmos argumentos repetidamente
+- ❌ Tomar decisões sem ter um critério de sucesso claro
+- ❌ Inventar dados quando uma ferramenta retorna vazio
