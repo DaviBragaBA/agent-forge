@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Forge — Conceitos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#050508; --border:rgba(0,240,255,.22); --text:#ececff; --muted:#7a7a9c;
+      --cyan:#00f0ff; --magenta:#ff00aa; --lime:#b6ff3c; --violet:#8b5cf6; --amber:#ffb020; }
+    *{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:Outfit,system-ui,sans-serif;line-height:1.5}
+    body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(rgba(0,240,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,.04) 1px,transparent 1px);background-size:56px 56px}
+    body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:radial-gradient(ellipse 80% 50% at 10% 0%,rgba(255,0,170,.14),transparent 50%),
+      radial-gradient(ellipse 60% 40% at 90% 20%,rgba(0,240,255,.12),transparent 45%),
+      radial-gradient(ellipse 70% 50% at 50% 100%,rgba(139,92,246,.1),transparent 50%)}
+    .page{position:relative;z-index:1}
+    .topnav{position:sticky;top:0;z-index:100;background:rgba(5,5,8,.88);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);padding:.65rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    .topnav-brand{font-family:Orbitron,sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.12em;color:var(--cyan);text-decoration:none}
+    .topnav-links{display:flex;flex-wrap:wrap;gap:.4rem}
+    .topnav-links a{font-family:"IBM Plex Mono",monospace;font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;
+      color:var(--muted);text-decoration:none;padding:.35rem .65rem;border:1px solid transparent;border-radius:6px}
+    .topnav-links a:hover{color:var(--cyan);border-color:rgba(0,240,255,.35);background:rgba(0,240,255,.06)}
+    .hero{padding:3rem 1.5rem 2.5rem;max-width:72rem;margin:0 auto}
+    .tag{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan);margin-bottom:.85rem}
+    h1{font-family:Orbitron,sans-serif;font-weight:900;font-size:clamp(2rem,5vw,3.6rem);line-height:1.08}
+    .grad{background:linear-gradient(135deg,var(--cyan),var(--magenta) 50%,var(--lime));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-sub{color:var(--muted);font-size:1.05rem;line-height:1.6;max-width:40rem;margin-top:.85rem;font-weight:300}
+    .toc{margin-top:1.75rem;display:flex;flex-wrap:wrap;gap:.5rem}
+    .toc a{font-family:"IBM Plex Mono",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;
+      color:var(--cyan);text-decoration:none;padding:.5rem .85rem;border:1px solid rgba(0,240,255,.35);border-radius:8px}
+    .toc a:hover{background:rgba(0,240,255,.08)}
+    section{padding:3rem 1.5rem;scroll-margin-top:4rem;border-top:1px solid rgba(0,240,255,.08)}
+    .section-inner{max-width:72rem;margin:0 auto}
+    h2{font-family:Orbitron,sans-serif;font-size:clamp(1.3rem,2.6vw,2rem);color:var(--text);margin-bottom:.35rem}
+    .section-sub{color:var(--muted);font-size:1rem;line-height:1.5;max-width:40rem;margin-bottom:1.75rem;font-weight:300}
+    code{font-family:"IBM Plex Mono",monospace;font-size:.9em}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem}
+    .mini{background:rgba(0,0,0,.38);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem}
+    .mini code{font-size:.95rem;font-weight:600;display:block;margin-bottom:.35rem}
+    .mini p{font-size:.82rem;color:var(--muted);line-height:1.45}
+    .concept{background:rgba(0,0,0,.38);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.35rem;height:100%}
+    .concept-head{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.5rem}
+    .concept-icon{font-size:2rem;line-height:1;flex-shrink:0}
+    .concept h3{font-size:1.05rem;font-weight:700;margin-bottom:.35rem}
+    .concept-desc{font-size:.85rem;color:var(--text);line-height:1.55;opacity:.92}
+    .meta{margin-top:.75rem;font-size:.75rem;line-height:1.55}
+    .meta-row{display:flex;gap:.5rem;margin-bottom:.4rem}
+    .meta-label{font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.08em;min-width:5.5rem;flex-shrink:0}
+    .meta-value{color:var(--muted)}
+    .warn{margin-top:.65rem;font-size:.72rem;font-family:"IBM Plex Mono",monospace;padding:.5rem .65rem;border-radius:6px;
+      color:var(--amber);border:1px solid rgba(255,176,32,.3);background:rgba(255,176,32,.05)}
+    footer{padding:2.5rem 1.5rem 3rem;border-top:1px solid var(--border);text-align:center}
+    footer a{font-family:"IBM Plex Mono",monospace;font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;
+      color:var(--cyan);text-decoration:none;padding:.5rem .85rem;border:1px solid rgba(0,240,255,.35);border-radius:8px}
+    @media(max-width:900px){.grid3{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){.grid3,.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="page">
+    <nav class="topnav" aria-label="Navegação de secções">
+      <a class="topnav-brand" href="#">AGENT FORGE</a>
+      <div class="topnav-links">
+        <a href="#contratos">Contratos</a>
+        <a href="#tipos">Tipos</a>
+        <a href="#arquiteturas">Arquiteturas</a>
+        <a href="#adapters">Adapters</a>
+        <a href="#memorias">Memórias</a>
+      </div>
+    </nav>
+    <header class="hero">
+      <div class="tag">Referência · Agent Forge</div>
+      <h1><span class="grad">CONCEITOS</span></h1>
+      <p class="hero-sub">Taxonomia completa — contratos, tipos, arquiteturas, adapters e memória. Use ao criar agents spec driven.</p>
+      <nav class="toc" aria-label="Índice">
+        <a href="#contratos">Contratos</a>
+        <a href="#tipos">Tipos</a>
+        <a href="#arquiteturas">Arquiteturas</a>
+        <a href="#adapters">Adapters</a>
+        <a href="#memorias">Memórias</a>
+      </nav>
+    </header>
+    <section id="contratos">
+      <div class="section-inner">
+        <div class="tag">// contratos</div>
+        <h2>Os 9 contratos</h2>
+        <p class="section-sub">A anatomia de cada agent — ficheiros Markdown que definem comportamento.</p>
+        <div class="grid3">
+          <div class="mini" style="border-color:rgba(0,240,255,.35)"><code style="color:var(--cyan)">agent.md</code><p>Identidade, tipo, objetivo, contrato de saída</p></div>
+          <div class="mini" style="border-color:rgba(255,0,170,.35)"><code style="color:var(--magenta)">loop.md</code><p>Controle do ciclo: max iterações, critérios de parada</p></div>
+          <div class="mini" style="border-color:rgba(139,92,246,.35)"><code style="color:var(--violet)">planner.md</code><p>Regras de decisão, arquitetura cognitiva</p></div>
+          <div class="mini" style="border-color:rgba(182,255,60,.35)"><code style="color:var(--lime)">skills.md</code><p>O que o agent SABE fazer (interface)</p></div>
+          <div class="mini" style="border-color:rgba(255,176,32,.35)"><code style="color:var(--amber)">toolbox.md</code><p>O que o agent PODE fazer (subconjunto autorizado)</p></div>
+          <div class="mini" style="border-color:rgba(0,240,255,.35)"><code style="color:var(--cyan)">executor.md</code><p>Validação, retry, tratamento de erros</p></div>
+          <div class="mini" style="border-color:rgba(255,0,170,.35)"><code style="color:var(--magenta)">rules.md</code><p>Limites, restrições, confirmações humanas</p></div>
+          <div class="mini" style="border-color:rgba(139,92,246,.35)"><code style="color:var(--violet)">hooks.md</code><p>Observabilidade (eventos)</p></div>
+          <div class="mini" style="border-color:rgba(182,255,60,.35)"><code style="color:var(--lime)">memory.md</code><p>Memórias (curta / longa / episódica / contextual)</p></div>
+        </div>
+      </div>
+    </section>
+    <section id="tipos">
+      <div class="section-inner">
+        <div class="tag">// tipos</div>
+        <h2>4 tipos de agent</h2>
+        <p class="section-sub">Modo de operação — como o agent recebe e processa pedidos.</p>
+        <div class="grid2">
+          <article class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--cyan))">⚡</span>
+              <div>
+                <h3 style="color:var(--cyan)">Task-Based</h3>
+                <p class="concept-desc">Recebe tarefa bem definida, executa e retorna. Fluxo direto sem decomposição.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">Ideal</span><span class="meta-value">Entrada clara · Objetivo específico · Sem ambiguidade</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">Ex.</span><span class="meta-value">MonitorAgent: recebe alerta, retorna diagnóstico</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--magenta))">💬</span>
+              <div>
+                <h3 style="color:var(--magenta)">Interativo</h3>
+                <p class="concept-desc">Quando a entrada é ambígua, faz perguntas antes de agir.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">Ideal</span><span class="meta-value">Contexto incompleto · Decisões críticas · Evitar suposições</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">Ex.</span><span class="meta-value">Tutor: identifica lacunas e pergunta antes de explicar</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--lime))">🎯</span>
+              <div>
+                <h3 style="color:var(--lime)">Orientado a Objetivo</h3>
+                <p class="concept-desc">Recebe objetivo amplo, decompõe em sub-objetivos executáveis.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">Ideal</span><span class="meta-value">Problemas complexos · Planejamento estruturado · Múltiplas etapas</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">Ex.</span><span class="meta-value">Backlog Decomposer: requisito → épicos → histórias → critérios</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(139,92,246,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--violet))">🤖</span>
+              <div>
+                <h3 style="color:var(--violet)">Autônomo</h3>
+                <p class="concept-desc">Reage a eventos. Não depende de solicitação humana direta.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--violet)">Ideal</span><span class="meta-value">Monitoramento contínuo · Resposta a triggers · Operação 24/7</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--violet)">Ex.</span><span class="meta-value">Watchdog: detecta anomalia e age dentro de limites</span></div>
+            </div>
+            <div class="warn">⚠ Ações sensíveis EXIGEM confirmação humana</div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section id="arquiteturas">
+      <div class="section-inner">
+        <div class="tag">// arquiteturas</div>
+        <h2>3 arquiteturas cognitivas</h2>
+        <p class="section-sub">Como o agent pensa — definido em <code style="color:var(--violet)">planner.md</code>.</p>
+        <div class="grid3">
+          <article class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--cyan))">🔄</span>
+              <div>
+                <h3 style="color:var(--cyan)">ReAct</h3>
+                <p class="concept-desc">Pensa, age e observa em ciclo. Descobre o caminho enquanto avança.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">+</span><span class="meta-value">Adapta-se ao contexto · Funciona bem com incerteza</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">−</span><span class="meta-value">Alto consumo de tokens · Menos previsível</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">Ideal</span><span class="meta-value">Problemas exploratórios, caminho incerto</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--magenta))">📋</span>
+              <div>
+                <h3 style="color:var(--magenta)">Plan-and-Execute</h3>
+                <p class="concept-desc">Cria plano completo no início e executa passo a passo.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">+</span><span class="meta-value">Previsível · Eficiente · Auditável</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">−</span><span class="meta-value">Não se adapta a mudanças · Falha silenciosamente se cenário muda</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">Ideal</span><span class="meta-value">Processos estruturados, etapas conhecidas</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--lime))">🪞</span>
+              <div>
+                <h3 style="color:var(--lime)">Reflection</h3>
+                <p class="concept-desc">Executa, avalia o próprio resultado e refina antes de finalizar.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">+</span><span class="meta-value">Alta qualidade · Detecta erros antes de entregar</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">−</span><span class="meta-value">Maior latência · Maior custo</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">Ideal</span><span class="meta-value">Cenários onde qualidade é crítica e erro é caro</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section id="adapters">
+      <div class="section-inner">
+        <div class="tag">// adapters</div>
+        <h2>4 adapters</h2>
+        <p class="section-sub">Conexão com o mundo real — dados, APIs e ferramentas.</p>
+        <div class="grid2">
+          <article class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--cyan))">🎭</span>
+              <div>
+                <h3 style="color:var(--cyan)">Mock</h3>
+                <p class="concept-desc">Dados simulados via LLM. Para prototipação e testes.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">Uso</span><span class="meta-value">Aprendizado, desenvolvimento inicial</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--magenta))">🌐</span>
+              <div>
+                <h3 style="color:var(--magenta)">REST</h3>
+                <p class="concept-desc">Chamadas HTTP a APIs reais.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">Uso</span><span class="meta-value">Integração com serviços externos</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--lime))">🗄️</span>
+              <div>
+                <h3 style="color:var(--lime)">Database</h3>
+                <p class="concept-desc">Queries em banco de dados (preferencialmente read-only e parametrizadas).</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">Uso</span><span class="meta-value">Consulta de dados estruturados</span></div>
+            </div>
+            <div class="warn">🔒 Apenas leitura · Queries parametrizadas · Validação rigorosa</div>
+          </article>
+          <article class="concept" style="border-color:rgba(139,92,246,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--violet))">🔌</span>
+              <div>
+                <h3 style="color:var(--violet)">MCP (Model Context Protocol)</h3>
+                <p class="concept-desc">Protocolo padronizado de comunicação com ferramentas.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--violet)">Uso</span><span class="meta-value">Integração padronizada e reutilizável</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section id="memorias">
+      <div class="section-inner">
+        <div class="tag">// memorias</div>
+        <h2>4 tipos de memória</h2>
+        <p class="section-sub">O que o agent lembra — definido em <code style="color:var(--lime)">memory.md</code>.</p>
+        <div class="grid2">
+          <article class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--cyan))">📝</span>
+              <div>
+                <h3 style="color:var(--cyan)">Memória Curta</h3>
+                <p class="concept-desc">Estado da execução atual. Morre ao final do ciclo.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--cyan)">Analogia</span><span class="meta-value">Mesa de trabalho</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--magenta))">📚</span>
+              <div>
+                <h3 style="color:var(--magenta)">Memória Longa</h3>
+                <p class="concept-desc">Conhecimento persistente: fatos, configurações, preferências.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--magenta)">Analogia</span><span class="meta-value">Caderno de referência</span></div>
+            </div>
+            <div class="warn">⚠ Armazenar apenas fatos confirmados por ferramenta</div>
+          </article>
+          <article class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--lime))">📔</span>
+              <div>
+                <h3 style="color:var(--lime)">Memória Episódica</h3>
+                <p class="concept-desc">Histórico de execuções anteriores e lições aprendidas.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--lime)">Analogia</span><span class="meta-value">Diário profissional</span></div>
+            </div>
+          </article>
+          <article class="concept" style="border-color:rgba(139,92,246,.3)">
+            <div class="concept-head">
+              <span class="concept-icon" style="filter:drop-shadow(0 0 12px var(--violet))">🔍</span>
+              <div>
+                <h3 style="color:var(--violet)">Memória Contextual</h3>
+                <p class="concept-desc">Recuperação por similaridade semântica via embeddings.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div class="meta-row"><span class="meta-label" style="color:var(--violet)">Analogia</span><span class="meta-value">Mecanismo de busca interno</span></div>
+              <div class="meta-row"><span class="meta-label" style="color:var(--violet)">Tech</span><span class="meta-value">Embeddings + similaridade cosseno</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <a href="slides/index.html">← Apresentação (slides)</a>
+    </footer>
+  </div>
+</body>
+</html>
