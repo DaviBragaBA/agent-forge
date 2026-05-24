@@ -1,6 +1,6 @@
 # agent.md
 
-> Identidade do agente (runtime oficial).
+> Identidade do agente.
 
 ---
 

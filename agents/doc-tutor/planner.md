@@ -1,4 +1,4 @@
-# Planner: Tutor da Pós em IA
+# Planner: Tutor de Documentos
 
 > Como o agent decide. Este NÃO é um prompt convencional — é um CONTRATO.
 > A LLM é obrigada a produzir saídas estruturadas dentro destes limites.

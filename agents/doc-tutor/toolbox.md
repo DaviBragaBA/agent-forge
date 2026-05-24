@@ -1,4 +1,4 @@
-# Toolbox: Tutor da Pós em IA
+# Toolbox: Tutor de Documentos
 
 > Ferramentas autorizadas para execução. Camada de controle e segurança.
 > O runtime BLOQUEIA qualquer ferramenta que não esteja aqui.

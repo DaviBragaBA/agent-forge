@@ -1,6 +1,6 @@
 ---
 name: executar-agent
-description: Executa um agent Agent Forge no Cursor sem API key — interpreta os contratos MD/YAML e corre o ciclo ReAct no chat. Use quando o utilizador disser "executar agent", "rodar agent", "usa o gerador-prompt", "gerador-prompt:", "pos-ia-tutor:", ou quiser usar um agent forjado sem python main.py nem OpenAI.
+description: Executa um agent Agent Forge no Cursor sem API key — interpreta os contratos MD/YAML e corre o ciclo ReAct no chat. Use quando o utilizador disser "executar agent", "rodar agent", "usa o gerador-prompt", "gerador-prompt:", "doc-tutor:", ou quiser usar um agent forjado sem python main.py nem OpenAI.
 ---
 
 # Executar Agent (Runtime Cursor)
@@ -10,19 +10,19 @@ description: Executa um agent Agent Forge no Cursor sem API key — interpreta o
 ## Quando usar
 
 - "Executa o gerador-prompt"
-- "Rodar agent pos-ia-tutor com entrada: ..."
+- "Rodar agent doc-tutor com entrada: ..."
 - "Usa o agent X para ..."
 - Qualquer pedido que referencie `agent-forge/agents/<nome>/`
 
 ## Filosofia
 
-O agent **não está no Python** — está na **especificação**. Lê os contratos e **simula o runtime do curso** no chat, usando ferramentas reais do Cursor (Read, Grep, Shell) quando a skill pedir dados reais.
+O agent **não está no Python** — está na **especificação**. Lê os contratos e **executa o ciclo ReAct** no chat, usando ferramentas reais do Cursor (Read, Grep, Shell) quando a skill pedir dados reais.
 
 ---
 
 ## Passo 0 — Resolver qual agent
 
-1. Se o utilizador disser o nome (`gerador-prompt`, `pos-ia-tutor`), usa esse.
+1. Se o utilizador disser o nome (`gerador-prompt`, `doc-tutor`), usa esse.
 2. Senão, lista `agent-forge/agents/*/blueprint.json` e pergunta qual (ou o mais óbvio pelo contexto).
 
 Pasta base: `agent-forge/agents/<nome>/`
@@ -104,7 +104,7 @@ Quando `FINALIZAR`, entrega artefato no formato de `contrato_saida` do blueprint
 
 **Exemplo `gerador-prompt`:** markdown com `titulo`, `prompt_system`, `prompt_user`, `variaveis`, `checklist_qualidade`, `dicas_uso`.
 
-**Exemplo `pos-ia-tutor`:** markdown com `titulo`, `conteudo`, `fontes`, `proxima_acao_sugerida`.
+**Exemplo `doc-tutor`:** markdown com `titulo`, `conteudo`, `fontes`, `proxima_acao_sugerida`.
 
 ---
 
@@ -127,7 +127,7 @@ status: objetivo_alcancado | limite_etapas | falta_progresso
 
 ```
 executar gerador-prompt: Quero um prompt para revisar PRs em Python
-rodar pos-ia-tutor: Explica ReAct com base no material da pós
+executar doc-tutor: Explica ReAct com base nos documentos do projeto
 executar agent gerador-prompt
 ```
 
@@ -142,7 +142,7 @@ Parseia tudo depois de `:` como **entrada**.
 - ❌ Inventar ferramentas fora da toolbox
 - ❌ Mais de 7 skills numa execução inventada (usa só as do contrato)
 
-## Opcional (curso / debug)
+## Opcional (debug)
 
 `python main.py rodar` em `agent-forge/runtime/` só se o utilizador **explicitamente** quiser testar o runtime Python com API — **não** é o fluxo default.
 
@@ -151,5 +151,4 @@ Parseia tudo depois de `:` como **entrada**.
 ## Referências
 
 - `agent-forge/docs/RUNTIME-CURSOR.md`
-- `agent-forge/docs/COMPARACAO-CURSO.md`
 - Skill irmã: `criador-de-agents`

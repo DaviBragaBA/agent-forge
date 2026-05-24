@@ -22,7 +22,7 @@ def carregar_yaml_do_md(caminho_arquivo: Path) -> dict:
 
 
 def _resolver_contrato(caminho_agente: Path, nome: str) -> Path:
-    """contracts/ (curso) ou raiz (agent-forge legado)."""
+    """contracts/ (padrão) ou raiz (legado)."""
     em_sub = caminho_agente / "contracts" / nome
     if em_sub.exists():
         return em_sub

@@ -7,15 +7,15 @@
 ```yaml
 habilidades:
 - nome: listar_materiais
-  descricao: Lista todos os PDFs e ficheiros de matéria disponíveis em c:\Users\davib\OneDrive\Área
-    de Trabalho\Pós em Inteligencia artificial
+  descricao: Lista PDFs e ficheiros de documentos disponíveis na pasta de documentos
+    configurada no workspace (ou raiz do projeto, se não houver pasta dedicada).
   entrada:
     filtro: string
   saida:
     materiais: float
 - nome: ler_capitulo
-  descricao: Lê um capítulo específico de um material, retorna o conteúdo textual
-    com numeração de páginas
+  descricao: Lê um capítulo ou secção específica de um documento, retorna o conteúdo
+    textual com numeração de páginas
   entrada:
     caminho_pdf: string
     intervalo_paginas: string
@@ -42,8 +42,9 @@ habilidades:
   saida:
     flashcards: list
 - nome: responder_duvida
-  descricao: Responde uma dúvida do aluno consultando o material disponível. SEMPRE
-    cita capítulo e página. Se não encontrar resposta no material, declara explicitamente.
+  descricao: Responde uma dúvida do utilizador consultando os documentos disponíveis.
+    SEMPRE cita ficheiro, secção e página. Se não encontrar resposta no material,
+    declara explicitamente.
   entrada:
     pergunta: string
     materiais_consultados: string
@@ -52,7 +53,7 @@ habilidades:
     fontes: float
     confianca: float
 - nome: criar_exercicio
-  descricao: Gera um exercício prático baseado num tópico da matéria. Inclui enunciado,
+  descricao: Gera um exercício prático baseado num tópico dos documentos. Inclui enunciado,
     dicas e gabarito separado.
   entrada:
     topico: string

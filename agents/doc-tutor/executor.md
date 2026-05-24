@@ -1,4 +1,4 @@
-# Executor: Tutor da Pós em IA
+# Executor: Tutor de Documentos
 
 > Como as ações são executadas. Garante segurança e consistência.
 

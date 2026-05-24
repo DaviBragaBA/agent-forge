@@ -1,5 +1,5 @@
+import docTutor from "@forge/agents/doc-tutor/blueprint.json";
 import geradorPrompt from "@forge/agents/gerador-prompt/blueprint.json";
-import posIaTutor from "@forge/agents/pos-ia-tutor/blueprint.json";
 
 export type AgentBlueprint = {
   nome: string;
@@ -14,6 +14,6 @@ export type AgentBlueprint = {
 
 /** Gerado automaticamente por scripts/generate.py — não editar à mão. */
 export const agents: AgentBlueprint[] = [
+  docTutor as AgentBlueprint,
   geradorPrompt as AgentBlueprint,
-  posIaTutor as AgentBlueprint,
 ];

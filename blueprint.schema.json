@@ -9,7 +9,7 @@
     "nome": {
       "type": "string",
       "pattern": "^[a-z0-9-]+$",
-      "description": "Nome do agent em kebab-case (ex: pos-ia-tutor)"
+      "description": "Nome do agent em kebab-case (ex: doc-tutor)"
     },
     "nome_amigavel": {
       "type": "string",

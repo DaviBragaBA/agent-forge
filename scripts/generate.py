@@ -159,7 +159,7 @@ def _render_if(text: str, ctx: dict[str, Any]) -> str:
 
 
 def _nome_para_var_js(nome: str) -> str:
-    """kebab-case → camelCase para import TS (ex: pos-ia-tutor → posIaTutor)."""
+    """kebab-case → camelCase para import TS (ex: doc-tutor → docTutor)."""
     partes = nome.split("-")
     return partes[0] + "".join(p.capitalize() for p in partes[1:])
 
@@ -264,7 +264,7 @@ def generate_agent(
 @click.option(
     "--runtime",
     is_flag=True,
-    help="Também exporta contratos YAML para agent-forge/runtime (curso oficial)",
+    help="Também exporta contratos YAML para agent-forge/runtime",
 )
 def cli(blueprint: Path, output: Path | None, runtime: bool) -> None:
     """Gera os 9 contratos MD de um agent a partir do blueprint JSON."""

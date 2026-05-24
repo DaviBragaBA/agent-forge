@@ -1,9 +1,9 @@
 {
-  "nome": "pos-ia-tutor",
-  "nome_amigavel": "Tutor da Pós em IA",
-  "descricao": "Agent tutor que ajuda a estudar a matéria da pós-graduação em Engenharia de Software com IA. Lê material da disciplina, gera resumos focados, cria flashcards de revisão espaçada e responde dúvidas com citações.",
+  "nome": "doc-tutor",
+  "nome_amigavel": "Tutor de Documentos",
+  "descricao": "Agent tutor que ajuda a estudar a partir de documentos no workspace. Lê PDFs e ficheiros de texto, gera resumos focados, cria flashcards de revisão espaçada e responde dúvidas com citações.",
   "tipo": "interactive",
-  "objetivo": "Acelerar a aprendizagem do aluno na pós em IA gerando resumos didáticos, flashcards e respostas baseadas exclusivamente no material oficial da disciplina, sempre citando capítulo e página.",
+  "objetivo": "Acelerar a aprendizagem do utilizador gerando resumos didáticos, flashcards e respostas baseadas exclusivamente nos documentos da pasta configurada no workspace, sempre citando ficheiro, secção e página.",
   "arquitetura_cognitiva": "react",
   "provider": "auto",
   "modelo": "claude-3-5-sonnet",
@@ -30,9 +30,9 @@
   "skills": [
     {
       "nome": "listar_materiais",
-      "descricao": "Lista todos os PDFs e ficheiros de matéria disponíveis em c:\\Users\\davib\\OneDrive\\Área de Trabalho\\Pós em Inteligencia artificial",
+      "descricao": "Lista PDFs e ficheiros de documentos disponíveis na pasta de documentos configurada no workspace (ou raiz do projeto, se não houver pasta dedicada).",
       "entrada": {
-        "filtro": "string opcional (ex: 'agente')"
+        "filtro": "string opcional (ex: 'agents')"
       },
       "saida": {
         "materiais": "Array<{ nome: string, caminho: string, tamanho_kb: number }>"
@@ -41,7 +41,7 @@
     },
     {
       "nome": "ler_capitulo",
-      "descricao": "Lê um capítulo específico de um material, retorna o conteúdo textual com numeração de páginas",
+      "descricao": "Lê um capítulo ou secção específica de um documento, retorna o conteúdo textual com numeração de páginas",
       "entrada": {
         "caminho_pdf": "string",
         "intervalo_paginas": "string (ex: '1-10', opcional)"
@@ -81,7 +81,7 @@
     },
     {
       "nome": "responder_duvida",
-      "descricao": "Responde uma dúvida do aluno consultando o material disponível. SEMPRE cita capítulo e página. Se não encontrar resposta no material, declara explicitamente.",
+      "descricao": "Responde uma dúvida do utilizador consultando os documentos disponíveis. SEMPRE cita ficheiro, secção e página. Se não encontrar resposta no material, declara explicitamente.",
       "entrada": {
         "pergunta": "string",
         "materiais_consultados": "string[]"
@@ -95,7 +95,7 @@
     },
     {
       "nome": "criar_exercicio",
-      "descricao": "Gera um exercício prático baseado num tópico da matéria. Inclui enunciado, dicas e gabarito separado.",
+      "descricao": "Gera um exercício prático baseado num tópico dos documentos. Inclui enunciado, dicas e gabarito separado.",
       "entrada": {
         "topico": "string",
         "nivel": "string (basico|intermediario|avancado)"
@@ -169,12 +169,12 @@
   ],
   "metadata": {
     "criado_em": "2026-05-23T15:43:00",
-    "criado_por": "agent-forge (primeiro agent)",
+    "criado_por": "agent-forge",
     "versao_blueprint": "1.0.0",
     "tags": [
       "estudos",
       "tutoria",
-      "pos-graduacao",
+      "documentos",
       "ia",
       "rag"
     ]

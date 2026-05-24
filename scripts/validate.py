@@ -5,7 +5,7 @@ Valida um agent gerado: schema, consistência skills↔toolbox, regras.
 
 Uso:
     python validate.py path/to/agent/
-    python validate.py ../agents/pos-ia-tutor/
+    python validate.py ../agents/doc-tutor/
 """
 from __future__ import annotations
 

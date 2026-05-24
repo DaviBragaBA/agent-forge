@@ -14,8 +14,8 @@ export function ForgePhilosophy() {
             O agent está na{" "}
             <span className="af-neon-lime font-bold">especificação</span>.
           </blockquote>
-          <p className="text-[var(--af-muted)] mt-6 text-sm">
-            ─ <em>Spec Driven Agents</em>, Rodrigo Fernandes
+          <p className="text-[var(--af-muted)] mt-6 text-sm af-mono">
+            ─ Spec Driven Agents
           </p>
         </div>
 

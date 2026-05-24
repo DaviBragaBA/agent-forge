@@ -12,7 +12,7 @@ const wizardSteps: Step[] = [
   {
     num: 1,
     title: "Abrir o wizard no Cursor",
-    body: "No chat do Cursor (workspace da pós), diz por exemplo: «criar um agent» ou «agent forge». A skill criador-de-agents abre o wizard em português.",
+    body: "No chat do Cursor, diz por exemplo: «criar um agent» ou «agent forge». A skill criador-de-agents abre o wizard em português.",
     code: 'criar um agent',
   },
   {
@@ -52,7 +52,7 @@ python main.py validar --agente ../agents/<nome>`,
     title: "Executar no Cursor (sem API key)",
     body: "No chat: executar <nome>: <pedido>. A skill executar-agent corre o agent aqui — usa Cursor/Claude Pro, zero API extra.",
     code: `executar gerador-prompt: Prompt para revisar PRs em Python`,
-    tip: "runtime/main.py rodar + OPENAI_API_KEY é só laboratório do curso, opcional.",
+    tip: "runtime/main.py rodar + OPENAI_API_KEY é opcional — só para testar o runtime Python.",
   },
   {
     num: 8,
@@ -105,8 +105,7 @@ export function TutorialPage() {
           </h1>
           <p className="text-[var(--af-muted)] mt-3 text-lg leading-relaxed">
             Como usar o <strong className="text-[var(--af-text)]">criador de agents</strong> do Agent Forge —
-            wizard no Cursor, scripts Python e runtime. Esta página não substitui as aulas do Git do curso;
-            ensina só o nosso fluxo.
+            wizard no Cursor, scripts Python e runtime.
           </p>
         </div>
       </header>
@@ -134,11 +133,11 @@ export function TutorialPage() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-4">Exemplo já forjado</h2>
           <p className="text-[var(--af-muted)] text-sm mb-4">
-            O <code className="af-mono af-neon-cyan">pos-ia-tutor</code> foi o primeiro agent. Podes inspecionar a
+            O <code className="af-mono af-neon-cyan">doc-tutor</code> é um agent de exemplo. Podes inspecionar a
             pasta e repetir os comandos trocando o nome.
           </p>
           <pre className="p-4 rounded-lg text-xs af-mono overflow-x-auto border border-[var(--af-border)] bg-[rgba(0,0,0,0.35)] text-[var(--af-lime)]">
-            {`python main.py rodar --agente ../agents/pos-ia-tutor --entrada "Lista os PDFs da pos"`}
+            {`executar doc-tutor: Resume o documento sobre ReAct`}
           </pre>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link to="/agents" className="af-btn-primary">

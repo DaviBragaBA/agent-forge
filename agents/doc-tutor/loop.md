@@ -1,4 +1,4 @@
-# Loop: Tutor da Pós em IA
+# Loop: Tutor de Documentos
 
 > Controle do Agent Loop. Define limites e critérios de parada.
 > Sem critério de parada, o agent pode entrar em execução infinita.

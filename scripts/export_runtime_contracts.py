@@ -1,11 +1,9 @@
 """
-Exporta contratos no formato do runtime oficial (curso Módulo 4).
-
-Gera YAML em blocos ```yaml dentro dos .md e pasta contracts/
+Exporta contratos no formato YAML em blocos ```yaml dentro dos .md e pasta contracts/
 para compatibilidade com agent-forge/runtime (Spec Driven Agents).
 
 Uso:
-    python export_runtime_contracts.py agents/pos-ia-tutor/blueprint.json
+    python export_runtime_contracts.py agents/doc-tutor/blueprint.json
 """
 
 from __future__ import annotations
@@ -126,7 +124,7 @@ def export_from_blueprint(bp: dict[str, Any], out: Path) -> None:
         },
     }
     (out / "agent.md").write_text(
-        _md_with_yaml("agent.md", "Identidade do agente (runtime oficial).", agent_yaml),
+        _md_with_yaml("agent.md", "Identidade do agente.", agent_yaml),
         encoding="utf-8",
     )
 
@@ -304,7 +302,7 @@ def export_from_blueprint(bp: dict[str, Any], out: Path) -> None:
     help="Pasta do agent (default: agents/<nome>/)",
 )
 def cli(blueprint: Path, output: Path | None) -> None:
-    """Exporta contratos YAML para o runtime oficial do curso."""
+    """Exporta contratos YAML para o runtime Python."""
     bp = json.loads(blueprint.read_text(encoding="utf-8"))
     out = output or (ROOT / "agents" / bp["nome"])
     export_from_blueprint(bp, out)

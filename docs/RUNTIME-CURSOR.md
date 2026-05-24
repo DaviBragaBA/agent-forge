@@ -2,43 +2,51 @@
 
 > O Agent Forge foi desenhado para correr **no Cursor**, usando a subscrição que já tens (Claude/Cursor Pro). Não precisas de OpenAI API nem de `main.py rodar` para uso normal.
 
-## Como executar
-
-No chat deste workspace:
+## Fluxo
 
 ```
-executar gerador-prompt: Quero um prompt para revisar PRs em Python
+executar <nome-agent>: <pedido>
+         ↓
+skill executar-agent
+         ↓
+lê agent.md + loop + planner + skills + rules
+         ↓
+ciclo ReAct no chat (Perceber → Planejar → Agir → Avaliar)
+         ↓
+artefacto + trace
 ```
 
-ou
+## Exemplos
 
 ```
-rodar pos-ia-tutor: O que são Spec Driven Agents?
+executar gerador-prompt: Prompt para revisar PRs em Python
+executar doc-tutor: O que é Spec Driven Agents?
 ```
 
 A skill **`executar-agent`** (`.cursor/skills/executar-agent/`) instrui o assistente a:
 
-1. Ler os contratos em `agents/<nome>/`
-2. Correr o ciclo PERCEBER → PLANEJAR → AGIR → AVALIAR
-3. Entregar o artefato final (`contrato_saida`)
-4. Mostrar um trace resumido
+1. Carregar contratos de `agent-forge/agents/<nome>/`
+2. Seguir `loop.md` e `planner.md`
+3. Chamar skills da `toolbox.md` (mock ou ferramentas reais do Cursor)
+4. Respeitar `rules.md` e entregar conforme `contrato_saida`
+5. Fechar com trace (agent, etapas, ferramentas, status)
 
-## O que continua a ser Python (grátis, sem LLM)
+## Decisões do planner
 
-| Script | Função |
-|--------|--------|
-| `scripts/generate.py --runtime` | Gera contratos |
-| `scripts/validate.py` | Valida blueprint |
-| `runtime/main.py validar` | Valida YAML (estrutura) |
+| Decisão | Quando |
+|---------|--------|
+| `CHAMAR_FERRAMENTA` | Próximo passo é uma skill |
+| `PERGUNTAR_USUARIO` | Falta contexto |
+| `FINALIZAR` | Objetivo alcançado |
 
-## Runtime Python + OpenAI (opcional)
+## Runtime Python (`runtime/`)
 
-A pasta `runtime/` vem do **curso** (aula 04). Só faz falta se quiseres reproduzir o laboratório oficial com `OPENAI_API_KEY`. **Não é o fluxo Agent Forge no dia a dia.**
+Pasta opcional para validação estrutural (`main.py validar`) ou execução com LLM externa (`main.py rodar` + `OPENAI_API_KEY`). **Não é o fluxo principal.**
 
-## Claude Pro vs Cursor vs API
+## Recursos
 
 | Recurso | Agent Forge no Cursor |
-|---------|------------------------|
-| Cursor Pro / Claude no chat | ✅ Runtime principal |
-| Claude Pro (claude.ai) | ❌ Não ligado ao terminal |
-| OpenAI API | ❌ Opcional (só `main.py rodar`) |
+|---------|----------------------|
+| Cursor Pro / Claude no chat | Runtime principal |
+| Read / Grep / Shell | Skills reais quando configurado |
+| OpenAI API | Opcional (runtime Python) |

@@ -39,9 +39,7 @@ export function HomePage() {
 
       <footer className="px-6 md:px-12 py-12 border-t border-[var(--af-border)] text-center">
         <p className="text-[var(--af-muted)] text-sm">
-          Agent Forge ·{" "}
-          <span className="af-neon-cyan">Spec Driven Agents</span> · curso{" "}
-          <em>Criação de Agentes Autônomos</em>
+          Agent Forge · <span className="af-neon-cyan">Spec Driven Agents</span>
         </p>
       </footer>
     </div>

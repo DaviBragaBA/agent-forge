@@ -1,6 +1,6 @@
 ---
 name: criador-de-agents
-description: Cria agents autônomos completos via wizard conversacional. Use quando o utilizador pedir "criar um agent", "novo agent", "agent forge", "spec driven agent", ou quiser gerar a estrutura de contratos (agent.md, loop.md, planner.md, skills.md, toolbox.md, executor.md, rules.md, hooks.md, memory.md) para um agent novo. Baseado na arquitetura Spec Driven Agents do curso "Criação de Agentes Autônomos".
+description: Cria agents autônomos completos via wizard conversacional. Use quando o utilizador pedir "criar um agent", "novo agent", "agent forge", "spec driven agent", ou quiser gerar a estrutura de contratos (agent.md, loop.md, planner.md, skills.md, toolbox.md, executor.md, rules.md, hooks.md, memory.md) para um agent novo. Arquitetura Spec Driven Agents.
 ---
 
 # Criador de Agents (Agent Forge)
@@ -161,7 +161,7 @@ python scripts/generate.py -b agents/<nome>/blueprint.json --runtime
 
 Isto gera:
 - 9 MD legíveis na raiz do agent
-- `contracts/` com YAML para o runtime oficial
+- `contracts/` com YAML para o runtime Python
 - Atualiza `web/src/data/agents.ts` (lista na UI `/agents`)
 
 Só exportar runtime (sem regenerar templates):
@@ -178,7 +178,7 @@ python scripts/export_runtime_contracts.py -b agents/<nome>/blueprint.json
 python scripts/validate.py agents/<nome>/
 ```
 
-**Runtime oficial** (YAML nos MD + toolbox ↔ skills):
+**Runtime Python** (YAML nos MD + toolbox ↔ skills):
 
 ```bash
 cd runtime
@@ -207,7 +207,7 @@ Apresentar também:
 - 🌐 UI: `cd agent-forge/web && npm run dev` → `/agents` e `/tutorial`
 - 🔄 Iterar: editar `blueprint.json` → `generate.py -b ... --runtime`
 
-**Opcional (só curso/lab):** `runtime/main.py rodar` requer `OPENAI_API_KEY` — **não** é o fluxo normal.
+**Opcional (runtime Python):** `runtime/main.py rodar` requer `OPENAI_API_KEY` — **não** é o fluxo normal.
 
 ## Regras de qualidade
 
@@ -224,7 +224,7 @@ Apresentar também:
 - ❌ Gerar um agent "que faz tudo" — focar num objetivo único e claro.
 - ❌ Listar 20 skills — manter entre 3 e 7 para o MVP.
 - ❌ Saltar a validação — sempre executar `validate.py` **e** `runtime/main.py validar`.
-- ❌ Esquecer `--runtime` — sem isso o agent não executa no runtime do curso.
+- ❌ Esquecer `--runtime` — sem isso o agent não exporta contratos YAML para o runtime Python.
 - ❌ Hardcoded de provider — usar `auto` por default.
 
 ## Referências
@@ -233,4 +233,3 @@ Apresentar também:
 - `agent-forge/blueprint.schema.json` — schema completo
 - `agent-forge/taxonomies.json` — taxonomias (tipos, arquiteturas, adapters, memórias)
 - `agent-forge/templates/*.template` — templates dos 9 contratos
-- PDF do curso "Criação de Agentes Autônomos" (Rodrigo Fernandes) — fonte da arquitetura

@@ -5,7 +5,7 @@
 ---
 
 ```yaml
-objetivo: pos_ia_tutor
+objetivo: doc_tutor
 ciclo:
   max_etapas: 8
 condicoes_parada:
