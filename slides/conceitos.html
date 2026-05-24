@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Forge — Conceitos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050508;
+      --glass: rgba(18, 18, 32, 0.72);
+      --border: rgba(0, 240, 255, 0.22);
+      --text: #ececff;
+      --muted: #7a7a9c;
+      --cyan: #00f0ff;
+      --magenta: #ff00aa;
+      --lime: #b6ff3c;
+      --violet: #8b5cf6;
+      --amber: #ffb020;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; overflow: hidden;
+      background: var(--bg); color: var(--text);
+      font-family: Outfit, system-ui, sans-serif;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,240,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,240,255,.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+    }
+    body::after {
+      content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(255,0,170,.14), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 90% 20%, rgba(0,240,255,.12), transparent 45%),
+        radial-gradient(ellipse 70% 50% at 50% 100%, rgba(139,92,246,.1), transparent 50%);
+    }
+    .deck { position: relative; z-index: 1; height: 100vh; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem 3rem 5rem;
+      opacity: 0; visibility: hidden; transform: translateX(32px);
+      transition: opacity .5s, transform .5s, visibility .5s;
+      overflow-y: auto;
+    }
+    .slide.active { opacity: 1; visibility: visible; transform: none; }
+    .inner { max-width: 1100px; width: 100%; position: relative; }
+    .tag {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .68rem; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: .85rem;
+    }
+    h1 {
+      font-family: Orbitron, sans-serif; font-weight: 900;
+      font-size: clamp(2rem, 4.5vw, 3.6rem); line-height: 1.08;
+    }
+    .grad {
+      background: linear-gradient(135deg, var(--cyan), var(--magenta) 50%, var(--lime));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    h2 {
+      font-family: Orbitron, sans-serif;
+      font-size: clamp(1.3rem, 2.6vw, 2rem);
+      color: var(--cyan); margin-bottom: .35rem;
+    }
+    .sub {
+      color: var(--muted); font-size: 1rem; line-height: 1.5;
+      max-width: 40rem; margin-bottom: 1rem; font-weight: 300;
+    }
+    code { font-family: "IBM Plex Mono", monospace; font-size: .9em; }
+    .num {
+      font-family: Orbitron, sans-serif; font-size: 4rem; opacity: .12;
+      color: var(--cyan); position: absolute; right: 0; top: -1.25rem;
+    }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin-top: .75rem; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .75rem; }
+    .grid4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-top: .75rem; }
+    .mini {
+      background: rgba(0,0,0,.38); border: 1px solid var(--border);
+      border-radius: 10px; padding: .7rem .85rem;
+    }
+    .mini code { font-size: .82rem; font-weight: 600; display: block; margin-bottom: .25rem; }
+    .mini p { font-size: .78rem; color: var(--muted); line-height: 1.45; }
+    .concept {
+      background: rgba(0,0,0,.38); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.1rem; height: 100%;
+    }
+    .concept-head { display: flex; align-items: flex-start; gap: .75rem; margin-bottom: .5rem; }
+    .concept-icon { font-size: 1.75rem; line-height: 1; flex-shrink: 0; }
+    .concept h3 { font-size: 1rem; font-weight: 700; margin-bottom: .35rem; }
+    .concept > p { font-size: .82rem; color: var(--text); line-height: 1.5; opacity: .9; }
+    .meta { margin-top: .6rem; font-size: .72rem; line-height: 1.5; }
+    .meta dt {
+      font-family: "IBM Plex Mono", monospace; text-transform: uppercase;
+      letter-spacing: .08em; display: inline; margin-right: .35rem;
+    }
+    .meta dd { display: inline; color: var(--muted); }
+    .meta div { margin-bottom: .35rem; }
+    .warn {
+      margin-top: .55rem; font-size: .7rem; font-family: "IBM Plex Mono", monospace;
+      padding: .45rem .6rem; border-radius: 6px;
+      color: var(--amber); border: 1px solid rgba(255,176,32,.3);
+      background: rgba(255,176,32,.05);
+    }
+    .nav-links { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
+    .nav-links a {
+      font-family: "IBM Plex Mono", monospace; font-size: .68rem;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--cyan); text-decoration: none;
+      padding: .5rem .85rem; border: 1px solid rgba(0,240,255,.35); border-radius: 8px;
+    }
+    .nav-links a:hover { background: rgba(0,240,255,.08); }
+    .nav {
+      position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); z-index: 10;
+      display: flex; align-items: center; gap: 1.25rem;
+      font-family: "IBM Plex Mono", monospace; font-size: .65rem;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+    }
+    .dots { display: flex; gap: .35rem; }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%; border: none;
+      background: var(--border); cursor: pointer; padding: 0;
+    }
+    .dot.on { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    kbd {
+      border: 1px solid var(--border); padding: .1rem .35rem;
+      border-radius: 3px; background: rgba(0,240,255,.06);
+    }
+    @media (max-width: 900px) {
+      .grid3 { grid-template-columns: 1fr 1fr; }
+      .slide { padding: 1.5rem 1.25rem 4rem; }
+    }
+    @media (max-width: 600px) {
+      .grid3, .grid2, .grid4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" id="deck">
+
+    <section class="slide active">
+      <div class="inner">
+        <div class="tag">Referência · Agent Forge</div>
+        <h1><span class="grad">CONCEITOS</span></h1>
+        <p class="sub" style="margin-top:.75rem;font-size:1.15rem">
+          Taxonomia completa — contratos, tipos, arquiteturas, adapters e memória. Use ao criar agents spec driven.
+        </p>
+        <div class="nav-links">
+          <a href="#s1">Contratos</a>
+          <a href="#s2">Tipos</a>
+          <a href="#s3">Arquiteturas</a>
+          <a href="#s4">Adapters</a>
+          <a href="#s5">Memórias</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s1">
+      <div class="inner">
+        <span class="num">01</span>
+        <div class="tag">// contratos</div>
+        <h2>Os 9 contratos</h2>
+        <p class="sub">A anatomia de cada agent — ficheiros Markdown que definem comportamento.</p>
+        <div class="grid3">
+          <div class="mini" style="border-color:rgba(0,240,255,.35)">
+            <code style="color:var(--cyan)">agent.md</code>
+            <p>Identidade, tipo, objetivo, contrato de saída</p>
+          </div>
+          <div class="mini" style="border-color:rgba(255,0,170,.35)">
+            <code style="color:var(--magenta)">loop.md</code>
+            <p>Controle do ciclo: max iterações, critérios de parada</p>
+          </div>
+          <div class="mini" style="border-color:rgba(139,92,246,.35)">
+            <code style="color:var(--violet)">planner.md</code>
+            <p>Regras de decisão, arquitetura cognitiva</p>
+          </div>
+          <div class="mini" style="border-color:rgba(182,255,60,.35)">
+            <code style="color:var(--lime)">skills.md</code>
+            <p>O que o agent SABE fazer (interface)</p>
+          </div>
+          <div class="mini" style="border-color:rgba(255,176,32,.35)">
+            <code style="color:var(--amber)">toolbox.md</code>
+            <p>O que o agent PODE fazer (subconjunto autorizado)</p>
+          </div>
+          <div class="mini" style="border-color:rgba(0,240,255,.35)">
+            <code style="color:var(--cyan)">executor.md</code>
+            <p>Validação, retry, tratamento de erros</p>
+          </div>
+          <div class="mini" style="border-color:rgba(255,0,170,.35)">
+            <code style="color:var(--magenta)">rules.md</code>
+            <p>Limites, restrições, confirmações humanas</p>
+          </div>
+          <div class="mini" style="border-color:rgba(139,92,246,.35)">
+            <code style="color:var(--violet)">hooks.md</code>
+            <p>Observabilidade (eventos)</p>
+          </div>
+          <div class="mini" style="border-color:rgba(182,255,60,.35)">
+            <code style="color:var(--lime)">memory.md</code>
+            <p>Memórias (curta / longa / episódica / contextual)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s2">
+      <div class="inner">
+        <span class="num">02</span>
+        <div class="tag">// tipos</div>
+        <h2>4 tipos de agent</h2>
+        <p class="sub">Modo de operação — como o agent recebe e processa pedidos.</p>
+        <div class="grid4">
+          <div class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">⚡</span>
+              <div>
+                <h3 style="color:var(--cyan)">Task-Based</h3>
+                <p>Recebe tarefa bem definida, executa e retorna. Fluxo direto sem decomposição.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--cyan)">Ideal</dt><dd>Entrada clara · Objetivo específico · Sem ambiguidade</dd></div>
+              <div><dt style="color:var(--cyan)">Ex.</dt><dd>MonitorAgent: alerta → diagnóstico</dd></div>
+            </div>
+          </div>
+          <div class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">💬</span>
+              <div>
+                <h3 style="color:var(--magenta)">Interativo</h3>
+                <p>Entrada ambígua — faz perguntas antes de agir.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--magenta)">Ideal</dt><dd>Contexto incompleto · Decisões críticas · Evitar suposições</dd></div>
+              <div><dt style="color:var(--magenta)">Ex.</dt><dd>Tutor: lacunas → pergunta → explica</dd></div>
+            </div>
+          </div>
+          <div class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🎯</span>
+              <div>
+                <h3 style="color:var(--lime)">Orientado a Objetivo</h3>
+                <p>Objetivo amplo → decompõe em sub-objetivos executáveis.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--lime)">Ideal</dt><dd>Problemas complexos · Planejamento · Múltiplas etapas</dd></div>
+              <div><dt style="color:var(--lime)">Ex.</dt><dd>Backlog: requisito → épicos → histórias</dd></div>
+            </div>
+          </div>
+          <div class="concept" style="border-color:rgba(139,92,246,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🤖</span>
+              <div>
+                <h3 style="color:var(--violet)">Autônomo</h3>
+                <p>Reage a eventos. Não depende de pedido humano direto.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--violet)">Ideal</dt><dd>Monitoramento · Triggers · Operação 24/7</dd></div>
+              <div><dt style="color:var(--violet)">Ex.</dt><dd>Watchdog: anomalia → ação limitada</dd></div>
+            </div>
+            <div class="warn">⚠ Ações sensíveis EXIGEM confirmação humana</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s3">
+      <div class="inner">
+        <span class="num">03</span>
+        <div class="tag">// arquiteturas</div>
+        <h2>3 arquiteturas cognitivas</h2>
+        <p class="sub">Como o agent pensa — definido em <code style="color:var(--violet)">planner.md</code>.</p>
+        <div class="grid3">
+          <div class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🔄</span>
+              <div>
+                <h3 style="color:var(--cyan)">ReAct</h3>
+                <p>Pensa, age e observa em ciclo. Descobre o caminho enquanto avança.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--cyan)">+</dt><dd>Adapta-se · Incerteza</dd></div>
+              <div><dt style="color:var(--magenta)">−</dt><dd>Alto consumo de tokens · Menos previsível</dd></div>
+              <div><dt style="color:var(--lime)">Ideal</dt><dd>Problemas exploratórios, caminho incerto</dd></div>
+            </div>
+          </div>
+          <div class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">📋</span>
+              <div>
+                <h3 style="color:var(--magenta)">Plan-and-Execute</h3>
+                <p>Plano completo no início, executa passo a passo.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--magenta)">+</dt><dd>Previsível · Eficiente · Auditável</dd></div>
+              <div><dt style="color:var(--magenta)">−</dt><dd>Não adapta · Falha silenciosa se cenário muda</dd></div>
+              <div><dt style="color:var(--lime)">Ideal</dt><dd>Processos estruturados, etapas conhecidas</dd></div>
+            </div>
+          </div>
+          <div class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🪞</span>
+              <div>
+                <h3 style="color:var(--lime)">Reflection</h3>
+                <p>Executa, avalia o próprio resultado e refina antes de finalizar.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--lime)">+</dt><dd>Alta qualidade · Detecta erros antes de entregar</dd></div>
+              <div><dt style="color:var(--magenta)">−</dt><dd>Maior latência · Maior custo</dd></div>
+              <div><dt style="color:var(--lime)">Ideal</dt><dd>Qualidade crítica, erro caro</dd></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s4">
+      <div class="inner">
+        <span class="num">04</span>
+        <div class="tag">// adapters</div>
+        <h2>4 adapters</h2>
+        <p class="sub">Conexão com o mundo real — dados, APIs e ferramentas.</p>
+        <div class="grid4">
+          <div class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🎭</span>
+              <div>
+                <h3 style="color:var(--cyan)">Mock</h3>
+                <p>Dados simulados via LLM. Prototipação e testes.</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--cyan)">Uso</dt><dd>Aprendizado, desenvolvimento inicial</dd></div></div>
+          </div>
+          <div class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🌐</span>
+              <div>
+                <h3 style="color:var(--magenta)">REST</h3>
+                <p>Chamadas HTTP a APIs reais.</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--magenta)">Uso</dt><dd>Integração com serviços externos</dd></div></div>
+          </div>
+          <div class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🗄️</span>
+              <div>
+                <h3 style="color:var(--lime)">Database</h3>
+                <p>Queries em banco (preferencialmente read-only e parametrizadas).</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--lime)">Uso</dt><dd>Consulta de dados estruturados</dd></div></div>
+            <div class="warn">🔒 Apenas leitura · Queries parametrizadas · Validação rigorosa</div>
+          </div>
+          <div class="concept" style="border-color:rgba(139,92,246,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🔌</span>
+              <div>
+                <h3 style="color:var(--violet)">MCP</h3>
+                <p>Model Context Protocol — comunicação padronizada com ferramentas.</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--violet)">Uso</dt><dd>Integração padronizada e reutilizável</dd></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s5">
+      <div class="inner">
+        <span class="num">05</span>
+        <div class="tag">// memorias</div>
+        <h2>4 tipos de memória</h2>
+        <p class="sub">O que o agent lembra — definido em <code style="color:var(--lime)">memory.md</code>.</p>
+        <div class="grid4">
+          <div class="concept" style="border-color:rgba(0,240,255,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">📝</span>
+              <div>
+                <h3 style="color:var(--cyan)">Memória Curta</h3>
+                <p>Estado da execução atual. Morre ao final do ciclo.</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--cyan)">Analogia</dt><dd>Mesa de trabalho</dd></div></div>
+          </div>
+          <div class="concept" style="border-color:rgba(255,0,170,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">📚</span>
+              <div>
+                <h3 style="color:var(--magenta)">Memória Longa</h3>
+                <p>Conhecimento persistente: fatos, configurações, preferências.</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--magenta)">Analogia</dt><dd>Caderno de referência</dd></div></div>
+            <div class="warn">⚠ Armazenar apenas fatos confirmados por ferramenta</div>
+          </div>
+          <div class="concept" style="border-color:rgba(182,255,60,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">📔</span>
+              <div>
+                <h3 style="color:var(--lime)">Memória Episódica</h3>
+                <p>Histórico de execuções anteriores e lições aprendidas.</p>
+              </div>
+            </div>
+            <div class="meta"><div><dt style="color:var(--lime)">Analogia</dt><dd>Diário profissional</dd></div></div>
+          </div>
+          <div class="concept" style="border-color:rgba(139,92,246,.3)">
+            <div class="concept-head">
+              <span class="concept-icon">🔍</span>
+              <div>
+                <h3 style="color:var(--violet)">Memória Contextual</h3>
+                <p>Recuperação por similaridade semântica via embeddings.</p>
+              </div>
+            </div>
+            <div class="meta">
+              <div><dt style="color:var(--violet)">Analogia</dt><dd>Mecanismo de busca interno</dd></div>
+              <div><dt style="color:var(--violet)">Tech</dt><dd>Embeddings + similaridade cosseno</dd></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="inner">
+        <div class="tag">Fim</div>
+        <h1><span class="grad">SPEC DRIVEN</span></h1>
+        <p class="sub" style="font-size:1.2rem;margin-top:1rem">
+          Contratos definem o agent. Taxonomia guia as escolhas. O Cursor executa.
+        </p>
+        <div class="nav-links" style="margin-top:2rem">
+          <a href="index.html">← Apresentação</a>
+          <a href="conceitos.html">↻ Conceitos</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="nav">
+    <span><kbd>←</kbd> <kbd>→</kbd> · <kbd>F11</kbd></span>
+    <div class="dots" id="dots"></div>
+    <span id="count">1 / 7</span>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.getElementById('dots');
+    const count = document.getElementById('count');
+    let cur = 0;
+
+    slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.type = 'button';
+      d.className = 'dot' + (i ? '' : ' on');
+      d.setAttribute('aria-label', 'Slide ' + (i + 1));
+      d.onclick = () => go(i);
+      dots.appendChild(d);
+    });
+
+    function go(n) {
+      if (n < 0 || n >= slides.length) return;
+      slides.forEach((s, i) => s.classList.toggle('active', i === n));
+      dots.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === n));
+      count.textContent = (n + 1) + ' / ' + slides.length;
+      cur = n;
+    }
+
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (!el) return;
+        e.preventDefault();
+        const idx = Array.from(slides).indexOf(el);
+        if (idx >= 0) go(idx);
+      });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+      if (e.key === 'Home') { e.preventDefault(); go(0); }
+      if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+    });
+  </script>
+</body>
+</html>

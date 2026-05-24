@@ -32,6 +32,25 @@ Depois do slide 4 ou 10, no Cursor:
 executar gerador-prompt: Quero um prompt para revisar PRs em Python no Cursor
 ```
 
+## Conceitos (taxonomia)
+
+Referência standalone — **9 contratos**, **4 tipos de agent**, **3 arquiteturas cognitivas**, **4 adapters**, **4 tipos de memória**.
+
+1. Abre `conceitos.html` no browser (mesma UX: **←** **→**, **F11**, dots).
+2. 7 slides: capa → contratos → tipos → arquiteturas → adapters → memórias → encerramento.
+3. Link de volta em `index.html` (último slide) e em `conceitos.html` (último slide → `index.html`).
+
+| # | Tema |
+|---|------|
+| 0 | Capa — Conceitos Agent Forge |
+| 1 | Os 9 contratos (agent … memory) |
+| 2 | 4 tipos de agent |
+| 3 | 3 arquiteturas cognitivas |
+| 4 | 4 adapters |
+| 5 | 4 tipos de memória |
+| 6 | Encerramento + link para apresentação |
+
 ## Caminho
 
-`agent-forge/slides/index.html`
+- `agent-forge/slides/index.html`
+- `agent-forge/slides/conceitos.html`
